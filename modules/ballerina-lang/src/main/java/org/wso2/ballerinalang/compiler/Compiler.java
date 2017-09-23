@@ -32,6 +32,7 @@ import org.wso2.ballerinalang.programfile.ProgramFileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 /**
  * @since 0.94
@@ -71,16 +72,20 @@ public class Compiler {
         this.compilerPhase = getCompilerPhase();
     }
 
-    public void compile(String sourcePkg) {
+    public BLangPackage compile(String sourcePkg) {
+        BLangPackage bLangPackage = null;
         switch (compilerPhase) {
             case DEFINE:
-                define(sourcePkg);
+                //define(sourcePkg);
+                bLangPackage = define(sourcePkg);
                 break;
             case TYPE_CHECK:
-                typeCheck(define(sourcePkg));
+                //typeCheck(define(sourcePkg));
+                bLangPackage = typeCheck(define(sourcePkg));
                 break;
             case CODE_ANALYZE:
-                codeAnalyze(typeCheck(define(sourcePkg)));
+                //codeAnalyze(typeCheck(define(sourcePkg)));
+                bLangPackage = typeCheck(define(sourcePkg));
                 break;
             case DESUGAR:
                 desugar(codeAnalyze(typeCheck(define(sourcePkg))));
@@ -89,6 +94,7 @@ public class Compiler {
                 gen(desugar(codeAnalyze(typeCheck(define(sourcePkg)))));
                 break;
         }
+        return bLangPackage;
     }
 
     private BLangPackage define(String sourcePkg) {
@@ -126,5 +132,9 @@ public class Compiler {
         }
 
         return CompilerPhase.fromValue(phaseName);
+    }
+
+    public BLangPackage getModel(String fileName) {
+       return pkgLoader.getModel(fileName);
     }
 }

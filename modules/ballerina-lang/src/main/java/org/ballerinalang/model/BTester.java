@@ -28,6 +28,7 @@ import static org.ballerinalang.compiler.CompilerOptionName.COMPILER_PHASE;
 import static org.ballerinalang.compiler.CompilerOptionName.PRESERVE_WHITESPACE;
 import static org.ballerinalang.compiler.CompilerOptionName.SOURCE_ROOT;
 
+import org.wso2.ballerinalang.compiler.tree.BLangPackage;
 /**
  * Tester class.
  */
@@ -42,9 +43,12 @@ public class BTester {
         CompilerContext context = new CompilerContext();
         options = CompilerOptions.getInstance(context);
 //        options.put(SOURCE_ROOT, System.getProperty("user.dir"));
-        options.put(SOURCE_ROOT, System.getProperty("user.dir") + "/bal-src");
+        /*options.put(SOURCE_ROOT, System.getProperty("user.dir") + "/bal-src");
         options.put(COMPILER_PHASE, "codeGen");
-        options.put(PRESERVE_WHITESPACE, "false");
+        options.put(PRESERVE_WHITESPACE, "false");*/
+        options.put(SOURCE_ROOT, "/home/nadeeshaan/Desktop");
+        options.put(COMPILER_PHASE, "typeCheck");
+        options.put(PRESERVE_WHITESPACE, "true");
 
         // How to set a custom diagnostic listener
         DiagnosticListener listener = diagnostic -> out.println(diagnostic.getMessage());
@@ -58,6 +62,8 @@ public class BTester {
 //        compiler.compile("bar.bal");
         compiler.compile("pkg.bal");
 //        compiler.compile("a.b.c");
+        BLangPackage bLangPackage = compiler.compile("test.bal");
+        System.out.println(bLangPackage);
     }
 
 }
