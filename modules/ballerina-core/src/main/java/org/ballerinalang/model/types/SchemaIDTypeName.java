@@ -38,4 +38,8 @@ public class SchemaIDTypeName extends SimpleTypeName {
     public String toString() {
         return getNameWithArray(getNameWithPkg() + "<" + schemaID + ">");
     }
+
+    public BType resolveBType(TypeNameResolver typeNameResolver) {
+        return typeNameResolver.resolve(this);
+    }
 }

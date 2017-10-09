@@ -15,30 +15,17 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.ballerinalang.model.types;
+package org.ballerinalang.util.semantics;
+
+import org.ballerinalang.model.SymbolScope;
 
 /**
- * {@code ConstraintTypeName} represents a constrained type which is a simple type name(int, boolean, json, Person..)
- * thet is constrained by a schema or a struct in Ballerina.
- *
- * @since 0.9.0
+ * @since 0.92
  */
-public class ConstraintTypeName extends SimpleTypeName {
-    protected SimpleTypeName constraint;
+public class SemanticAnalyzerContext {
 
-    public ConstraintTypeName(String name) {
-        super(name, null, null);
-    }
+    SymbolScope currentScope;
 
-    public String getName() {
-        return name;
-    }
-
-    public SimpleTypeName getConstraint() {
-        return constraint;
-    }
-
-    public void setConstraint(SimpleTypeName constraint) {
-        this.constraint = constraint;
-    }
+    //TODO Remove
+    SemanticAnalyzer semanticAnalyzer;
 }

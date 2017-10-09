@@ -15,33 +15,16 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.ballerinalang.model;
+package org.ballerinalang.util.semantics;
 
-import org.ballerinalang.model.types.BType;
+import org.ballerinalang.model.expressions.Expression;
 
 /**
- * {@code ExecutableMultiReturnExpr} interface makes an {@link org.ballerinalang.model.expressions.Expression}.
- * which returns multiple values executable.
+ * This class holds the results of the type assignability check.
  *
- * @since 0.8.0
+ * @since 0.88
  */
-public interface ExecutableMultiReturnExpr {
-
-    /**
-     * Returns an arrays of argument types of this expression.
-     *
-     * @return an arrays of argument types
-     */
-    BType[] getTypes();
-
-    /**
-     * Sets an arrays of argument types.
-     *
-     * @param types arrays of argument types
-     */
-    void setTypes(BType[] types);
-
-    int[] getOffsets();
-
-    void setOffsets(int[] offsets);
+public class AssignabilityResult {
+    boolean assignable;
+    Expression expression;
 }

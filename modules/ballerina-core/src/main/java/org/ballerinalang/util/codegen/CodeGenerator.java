@@ -31,11 +31,11 @@ import org.ballerinalang.model.BallerinaFunction;
 import org.ballerinalang.model.CallableUnit;
 import org.ballerinalang.model.CompilationUnit;
 import org.ballerinalang.model.ConstDef;
-import org.ballerinalang.model.ExecutableMultiReturnExpr;
 import org.ballerinalang.model.Function;
 import org.ballerinalang.model.GlobalVariableDef;
 import org.ballerinalang.model.Identifier;
 import org.ballerinalang.model.ImportPackage;
+import org.ballerinalang.model.MultiReturnExpr;
 import org.ballerinalang.model.NamespaceDeclaration;
 import org.ballerinalang.model.NodeLocation;
 import org.ballerinalang.model.NodeVisitor;
@@ -121,7 +121,7 @@ import org.ballerinalang.model.statements.WorkerReplyStmt;
 import org.ballerinalang.model.types.BArrayType;
 import org.ballerinalang.model.types.BConnectorType;
 import org.ballerinalang.model.types.BFunctionType;
-import org.ballerinalang.model.types.BJSONConstraintType;
+import org.ballerinalang.model.types.BJSONConstrainedType;
 import org.ballerinalang.model.types.BStructType;
 import org.ballerinalang.model.types.BType;
 import org.ballerinalang.model.types.BTypes;
@@ -854,8 +854,8 @@ public class CodeGenerator implements NodeVisitor {
         rExpr.accept(this);
 
         int[] rhsExprRegIndexes;
-        if (assignStmt.getRExpr() instanceof ExecutableMultiReturnExpr) {
-            rhsExprRegIndexes = ((ExecutableMultiReturnExpr) assignStmt.getRExpr()).getOffsets();
+        if (assignStmt.getRExpr() instanceof MultiReturnExpr) {
+            rhsExprRegIndexes = ((MultiReturnExpr) assignStmt.getRExpr()).getOffsets();
         } else {
             rhsExprRegIndexes = new int[]{assignStmt.getRExpr().getTempOffset()};
         }
@@ -2202,7 +2202,7 @@ public class CodeGenerator implements NodeVisitor {
                 fieldBasedVarRefExpr.setTempOffset(mapValueRegIndex);
             }
 
-        } else if (varRefType == BTypes.typeJSON || varRefType instanceof BJSONConstraintType) {
+        } else if (varRefType == BTypes.typeJSON || varRefType instanceof BJSONConstrainedType) {
             BasicLiteral indexLiteral = new BasicLiteral(fieldBasedVarRefExpr.getNodeLocation(), null,
                     new BString(fieldName));
             indexLiteral.setType(BTypes.typeString);
@@ -2742,7 +2742,7 @@ public class CodeGenerator implements NodeVisitor {
             case TypeSignature.SIG_CJSON:
                 packageInfo = programFile.getPackageInfo(typeSig.getPkgPath());
                 StructInfo structInf = packageInfo.getStructInfo(typeSig.getName());
-                return new BJSONConstraintType(structInf.getType());
+                return new BJSONConstrainedType(structInf.getType());
             case TypeSignature.SIG_ANY:
                 return BTypes.typeAny;
             case TypeSignature.SIG_TYPE:

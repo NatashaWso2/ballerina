@@ -32,7 +32,7 @@ import java.util.StringJoiner;
  *
  * @since 1.0.0
  */
-public final class BStruct implements BRefType, StructureType {
+public final class BStruct implements BRefTypeValue, StructureType {
 
     private BStruct stackTrace;
     private HashMap<String, Object> nativeData = new HashMap<>();
@@ -42,7 +42,7 @@ public final class BStruct implements BRefType, StructureType {
     private String[] stringFields;
     private int[] intFields;
     private byte[][] byteFields;
-    private BRefType[] refFields;
+    private BRefTypeValue[] refFields;
 
     private BStructType structType;
 
@@ -59,7 +59,7 @@ public final class BStruct implements BRefType, StructureType {
         Arrays.fill(stringFields, "");
         intFields = new int[fieldCount[3]];
         byteFields = new byte[fieldCount[4]][];
-        refFields = new BRefType[fieldCount[5]];
+        refFields = new BRefTypeValue[fieldCount[5]];
     }
 
     /**
@@ -171,12 +171,12 @@ public final class BStruct implements BRefType, StructureType {
     }
 
     @Override
-    public BRefType getRefField(int index) {
+    public BRefTypeValue getRefField(int index) {
         return refFields[index];
     }
 
     @Override
-    public void setRefField(int index, BRefType value) {
+    public void setRefField(int index, BRefTypeValue value) {
         refFields[index] = value;
     }
 

@@ -30,8 +30,8 @@ public class BXMLAttributesType extends BType {
     /**
      * Create a {@code BXMLAttributesType} represents the type an xml-attribute-map in ballerina.
      *
-     * @param typeName string name of the type
-     * @param pkgPath package path
+     * @param typeName    string name of the type
+     * @param pkgPath     package path
      * @param symbolScope symbol scope of the type
      */
     BXMLAttributesType(String typeName, String pkgPath, SymbolScope symbolScope) {
@@ -55,5 +55,10 @@ public class BXMLAttributesType extends BType {
     @Override
     public int getTag() {
         return TypeTags.XML_ATTRIBUTES_TAG;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this == obj;
     }
 }

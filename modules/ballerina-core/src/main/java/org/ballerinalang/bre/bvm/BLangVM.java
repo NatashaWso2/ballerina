@@ -27,7 +27,7 @@ import org.ballerinalang.bre.nonblocking.debugger.VariableInfo;
 import org.ballerinalang.model.NodeLocation;
 import org.ballerinalang.model.types.BArrayType;
 import org.ballerinalang.model.types.BConnectorType;
-import org.ballerinalang.model.types.BJSONConstraintType;
+import org.ballerinalang.model.types.BJSONConstrainedType;
 import org.ballerinalang.model.types.BStructType;
 import org.ballerinalang.model.types.BType;
 import org.ballerinalang.model.types.BTypes;
@@ -50,7 +50,7 @@ import org.ballerinalang.model.values.BJSON;
 import org.ballerinalang.model.values.BMap;
 import org.ballerinalang.model.values.BMessage;
 import org.ballerinalang.model.values.BNewArray;
-import org.ballerinalang.model.values.BRefType;
+import org.ballerinalang.model.values.BRefTypeValue;
 import org.ballerinalang.model.values.BRefValueArray;
 import org.ballerinalang.model.values.BString;
 import org.ballerinalang.model.values.BStringArray;
@@ -224,6 +224,23 @@ public class BLangVM {
         int j;
         int k;
         int cpIndex; // Index of the constant pool
+        int fieldIndex;
+        int localNameIndex;
+        int uriIndex;
+        int prefixIndex;
+
+        BIntArray bIntArray;
+        BFloatArray bFloatArray;
+        BStringArray bStringArray;
+        BBooleanArray bBooleanArray;
+        BBlobArray bBlobArray;
+        BRefValueArray bArray;
+        StructureType structureType;
+        BMap<String, BRefTypeValue> bMap;
+        BJSON jsonVal;
+        BXML<?> xmlVal;
+        BXMLAttributes xmlAttrs;
+        BXMLQName xmlQName;
         FunctionCallCPEntry funcCallCPEntry;
         FunctionRefCPEntry funcRefCPEntry;
         TypeRefCPEntry typeRefCPEntry;
@@ -649,15 +666,33 @@ public class BLangVM {
 
                 case InstructionCodes.INEWARRAY:
                     i = operands[0];
+/*
+<<<<<<< HEAD
                     sf.refRegs[i] = new BIntArray();
+=======
+*/
+                    j = operands[1];
+                    k = operands[2];
+                    bMap = (BMap<String, BRefTypeValue>) sf.refRegs[i];
+                    if (bMap == null) {
+                        handleNullRefError();
+                        break;
+                    }
+
+                    sf.refRegs[k] = bMap.get(sf.stringRegs[j]);
                     break;
                 case InstructionCodes.ARRAYLEN:
                     i = operands[0];
                     j = operands[1];
+/*<<<<<<< HEAD
 
                     BValue value = sf.refRegs[i];
 
                     if (value == null) {
+=======*/
+                    k = operands[2];
+                    bMap = (BMap<String, BRefTypeValue>) sf.refRegs[i];
+                    if (bMap == null) {
                         handleNullRefError();
                         break;
                     }
@@ -1730,9 +1765,81 @@ public class BLangVM {
                     break;
                 }
 
-                xmlQName = (BXMLQName) sf.refRegs[j];
-                if (xmlQName == null) {
-                    handleNullRefError();
+                case InstructionCodes.NEWSTRUCT:
+                    createNewStruct(operands, sf);
+                    break;
+                case InstructionCodes.NEWCONNECTOR:
+                    createNewConnector(operands, sf);
+                    break;
+                case InstructionCodes.NEWMAP:
+                    i = operands[0];
+                    sf.refRegs[i] = new BMap<String, BRefTypeValue>();
+                    break;
+                case InstructionCodes.NEWJSON:
+                    i = operands[0];
+                    sf.refRegs[i] = new BJSON("{}");
+                    break;
+                case InstructionCodes.NEWMESSAGE:
+                    i = operands[0];
+                    sf.refRegs[i] = new BMessage();
+                    break;
+                case InstructionCodes.NEWDATATABLE:
+                    i = operands[0];
+                    sf.refRegs[i] = new BDataTable(null, new ArrayList<>(0));
+                    break;
+                case InstructionCodes.REP:
+                    handleReply(operands, sf);
+                    break;
+                case InstructionCodes.IRET:
+                    i = operands[0];
+                    j = operands[1];
+                    currentSF = controlStack.getCurrentFrame();
+                    callersSF = controlStack.getStack()[controlStack.fp - 1];
+                    callersRetRegIndex = currentSF.retRegIndexes[i];
+                    callersSF.longRegs[callersRetRegIndex] = currentSF.longRegs[j];
+                    break;
+                case InstructionCodes.FRET:
+                    i = operands[0];
+                    j = operands[1];
+                    currentSF = controlStack.getCurrentFrame();
+                    callersSF = controlStack.getStack()[controlStack.fp - 1];
+                    callersRetRegIndex = currentSF.retRegIndexes[i];
+                    callersSF.doubleRegs[callersRetRegIndex] = currentSF.doubleRegs[j];
+                    break;
+                case InstructionCodes.SRET:
+                    i = operands[0];
+                    j = operands[1];
+                    currentSF = controlStack.getCurrentFrame();
+                    callersSF = controlStack.getStack()[controlStack.fp - 1];
+                    callersRetRegIndex = currentSF.retRegIndexes[i];
+                    callersSF.stringRegs[callersRetRegIndex] = currentSF.stringRegs[j];
+                    break;
+                case InstructionCodes.BRET:
+                    i = operands[0];
+                    j = operands[1];
+                    currentSF = controlStack.getCurrentFrame();
+                    callersSF = controlStack.getStack()[controlStack.fp - 1];
+                    callersRetRegIndex = currentSF.retRegIndexes[i];
+                    callersSF.intRegs[callersRetRegIndex] = currentSF.intRegs[j];
+                    break;
+                case InstructionCodes.LRET:
+                    i = operands[0];
+                    j = operands[1];
+                    currentSF = controlStack.getCurrentFrame();
+                    callersSF = controlStack.getStack()[controlStack.fp - 1];
+                    callersRetRegIndex = currentSF.retRegIndexes[i];
+                    callersSF.byteRegs[callersRetRegIndex] = currentSF.byteRegs[j];
+                    break;
+                case InstructionCodes.RRET:
+                    i = operands[0];
+                    j = operands[1];
+                    currentSF = controlStack.getCurrentFrame();
+                    callersSF = controlStack.getStack()[controlStack.fp - 1];
+                    callersRetRegIndex = currentSF.retRegIndexes[i];
+                    callersSF.refRegs[callersRetRegIndex] = currentSF.refRegs[j];
+                    break;
+                case InstructionCodes.RET:
+                    handleReturn();
                     break;
                 }
 
@@ -1820,7 +1927,7 @@ public class BLangVM {
         int k;
         int cpIndex; // Index of the constant pool
 
-        BRefType bRefType;
+        BRefTypeValue bRefTypeValue;
         TypeRefCPEntry typeRefCPEntry;
 
         switch (opcode) {
@@ -1854,16 +1961,15 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     sf.longRegs[j] = 0;
                     handleTypeCastError(sf, k, BTypes.typeNull, BTypes.typeInt);
-                } else if (bRefType.getType() == BTypes.typeInt) {
-                    sf.refRegs[k] = null;
-                    sf.longRegs[j] = ((BInteger) bRefType).intValue();
+                } else if (bRefTypeValue.getType() == BTypes.typeInt) {
+                    sf.longRegs[j] = ((BInteger) bRefTypeValue).intValue();
                 } else {
                     sf.longRegs[j] = 0;
-                    handleTypeCastError(sf, k, bRefType.getType(), BTypes.typeInt);
+                    handleTypeCastError(sf, k, bRefTypeValue.getType(), BTypes.typeInt);
                 }
                 break;
             case InstructionCodes.ANY2F:
@@ -1871,16 +1977,15 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     sf.doubleRegs[j] = 0;
                     handleTypeCastError(sf, k, BTypes.typeNull, BTypes.typeFloat);
-                } else if (bRefType.getType() == BTypes.typeFloat) {
-                    sf.refRegs[k] = null;
-                    sf.doubleRegs[j] = ((BFloat) bRefType).floatValue();
+                } else if (bRefTypeValue.getType() == BTypes.typeFloat) {
+                    sf.doubleRegs[j] = ((BFloat) bRefTypeValue).floatValue();
                 } else {
                     sf.doubleRegs[j] = 0;
-                    handleTypeCastError(sf, k, bRefType.getType(), BTypes.typeFloat);
+                    handleTypeCastError(sf, k, bRefTypeValue.getType(), BTypes.typeFloat);
                 }
                 break;
             case InstructionCodes.ANY2S:
@@ -1888,16 +1993,15 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     sf.stringRegs[j] = "";
                     handleTypeCastError(sf, k, BTypes.typeNull, BTypes.typeString);
-                } else if (bRefType.getType() == BTypes.typeString) {
-                    sf.refRegs[k] = null;
-                    sf.stringRegs[j] = bRefType.stringValue();
+                } else if (bRefTypeValue.getType() == BTypes.typeString) {
+                    sf.stringRegs[j] = bRefTypeValue.stringValue();
                 } else {
                     sf.stringRegs[j] = "";
-                    handleTypeCastError(sf, k, bRefType.getType(), BTypes.typeString);
+                    handleTypeCastError(sf, k, bRefTypeValue.getType(), BTypes.typeString);
                 }
                 break;
             case InstructionCodes.ANY2B:
@@ -1905,16 +2009,15 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     sf.intRegs[j] = 0;
                     handleTypeCastError(sf, k, BTypes.typeNull, BTypes.typeBoolean);
-                } else if (bRefType.getType() == BTypes.typeBoolean) {
-                    sf.refRegs[k] = null;
-                    sf.intRegs[j] = ((BBoolean) bRefType).booleanValue() ? 1 : 0;
+                } else if (bRefTypeValue.getType() == BTypes.typeBoolean) {
+                    sf.intRegs[j] = ((BBoolean) bRefTypeValue).booleanValue() ? 1 : 0;
                 } else {
                     sf.intRegs[j] = 0;
-                    handleTypeCastError(sf, k, bRefType.getType(), BTypes.typeBoolean);
+                    handleTypeCastError(sf, k, bRefTypeValue.getType(), BTypes.typeBoolean);
                 }
                 break;
             case InstructionCodes.ANY2L:
@@ -1922,16 +2025,15 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     sf.byteRegs[j] = new byte[0];
                     handleTypeCastError(sf, k, BTypes.typeNull, BTypes.typeBlob);
-                } else if (bRefType.getType() == BTypes.typeBlob) {
-                    sf.refRegs[k] = null;
-                    sf.byteRegs[j] = ((BBlob) bRefType).blobValue();
+                } else if (bRefTypeValue.getType() == BTypes.typeBlob) {
+                    sf.byteRegs[j] = ((BBlob) bRefTypeValue).blobValue();
                 } else {
                     sf.byteRegs[j] = new byte[0];
-                    handleTypeCastError(sf, k, bRefType.getType(), BTypes.typeBlob);
+                    handleTypeCastError(sf, k, bRefTypeValue.getType(), BTypes.typeBlob);
                 }
                 break;
             case InstructionCodes.ANY2JSON:
@@ -1961,16 +2063,16 @@ public class BLangVM {
                 k = operands[3];
                 typeRefCPEntry = (TypeRefCPEntry) constPool[cpIndex];
 
-                bRefType = sf.refRegs[i];
+                bRefTypeValue = sf.refRegs[i];
 
-                if (bRefType == null) {
+                if (bRefTypeValue == null) {
                     sf.refRegs[j] = null;
-                } else if (checkCast(bRefType, typeRefCPEntry.getType())) {
+                } else if (checkCast(bRefTypeValue, typeRefCPEntry.getType())) {
                     sf.refRegs[j] = sf.refRegs[i];
                     sf.refRegs[k] = null;
                 } else {
                     sf.refRegs[j] = null;
-                    handleTypeCastError(sf, k, bRefType.getType(), typeRefCPEntry.getType());
+                    handleTypeCastError(sf, k, bRefTypeValue.getType(), typeRefCPEntry.getType());
                 }
                 break;
             case InstructionCodes.NULL2JSON:
@@ -2004,7 +2106,7 @@ public class BLangVM {
         int i;
         int j;
         int k;
-        BRefType bRefType;
+        BRefTypeValue bRefTypeValue;
 
         switch (opcode) {
             case InstructionCodes.I2F:
@@ -2120,14 +2222,14 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     handleNullRefError();
                     break;
                 }
 
                 try {
-                    sf.refRegs[j] = XMLUtils.datatableToXML((BDataTable) bRefType, context.isInTransaction());
+                    sf.refRegs[j] = XMLUtils.datatableToXML((BDataTable) bRefTypeValue, context.isInTransaction());
                 } catch (Exception e) {
                     sf.refRegs[j] = null;
                     handleTypeConversionError(sf, k, TypeConstants.DATATABLE_TNAME, TypeConstants.XML_TNAME);
@@ -2138,14 +2240,14 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     handleNullRefError();
                     break;
                 }
 
                 try {
-                    sf.refRegs[j] = JSONUtils.toJSON((BDataTable) bRefType, context.isInTransaction());
+                    sf.refRegs[j] = JSONUtils.toJSON((BDataTable) bRefTypeValue, context.isInTransaction());
                 } catch (Exception e) {
                     sf.refRegs[j] = null;
                     handleTypeConversionError(sf, k, TypeConstants.DATATABLE_TNAME, TypeConstants.XML_TNAME);
@@ -2168,8 +2270,8 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     sf.refRegs[j] = null;
                     break;
                 }
@@ -2186,8 +2288,8 @@ public class BLangVM {
                 j = operands[1];
                 k = operands[2];
 
-                bRefType = sf.refRegs[i];
-                if (bRefType == null) {
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     sf.refRegs[j] = null;
                     break;
                 }
@@ -2203,9 +2305,14 @@ public class BLangVM {
                 i = operands[0];
                 j = operands[1];
                 k = operands[2];
+/*<<<<<<< HEAD
 
                 bRefType = sf.refRegs[i];
                 if (bRefType == null) {
+=======*/
+                
+                bRefTypeValue = sf.refRegs[i];
+                if (bRefTypeValue == null) {
                     sf.refRegs[j] = null;
                     break;
                 }
@@ -2438,14 +2545,14 @@ public class BLangVM {
         int j = operands[1];
         int k = operands[2];
 
-        BRefType bRefType = sf.refRegs[i];
-        if (bRefType == null) {
+        BRefTypeValue bRefTypeValue = sf.refRegs[i];
+        if (bRefTypeValue == null) {
             sf.refRegs[j] = null;
-        } else if (bRefType.getType() == targetType) {
-            sf.refRegs[j] = bRefType;
+        } else if (bRefTypeValue.getType() == targetType) {
+            sf.refRegs[j] = bRefTypeValue;
         } else {
             sf.refRegs[j] = null;
-            handleTypeCastError(sf, k, bRefType.getType(), targetType);
+            handleTypeCastError(sf, k, bRefTypeValue.getType(), targetType);
         }
     }
 
@@ -2834,7 +2941,7 @@ public class BLangVM {
                     currentSF.getIntRegs()[++booleanRegIndex] = (((BBoolean) passedInValues[i]).booleanValue()) ? 1 : 0;
                     break;
                 default:
-                    currentSF.getRefRegs()[++refRegIndex] = (BRefType) passedInValues[i];
+                    currentSF.getRefRegs()[++refRegIndex] = (BRefTypeValue) passedInValues[i];
             }
         }
     }
@@ -3128,14 +3235,14 @@ public class BLangVM {
                     callerSF.byteRegs[callersRetRegIndex] = ((BBlob) returnValues[i]).blobValue();
                     break;
                 default:
-                    callerSF.refRegs[callersRetRegIndex] = (BRefType) returnValues[i];
+                    callerSF.refRegs[callersRetRegIndex] = (BRefTypeValue) returnValues[i];
             }
         }
     }
 
-    private boolean checkConstraintJSONCast(BType targetType, BRefType value) {
+    private boolean checkConstraintJSONCast(BType targetType, BRefTypeValue value) {
         if (checkConstraintJSONEquivalency((BJSON) value,
-                (BStructType) ((BJSONConstraintType) targetType).getConstraint())) {
+                (BStructType) ((BJSONConstrainedType) targetType).getConstraint())) {
             return true;
         }
         return false;
@@ -3159,7 +3266,7 @@ public class BLangVM {
 
         if (targetType.getTag() == TypeTags.C_JSON_TAG &&
                 sourceValue.getType().getTag() == TypeTags.JSON_TAG) {
-            return checkConstraintJSONCast(targetType, (BRefType) sourceValue);
+            return checkConstraintJSONCast(targetType, (BRefTypeValue) sourceValue);
         }
 
         // Check JSON casting
@@ -3502,7 +3609,7 @@ public class BLangVM {
                         }
                         break;
                     default:
-                        bStruct.setRefField(++refRegIndex, (BRefType) mapVal);
+                        bStruct.setRefField(++refRegIndex, (BRefTypeValue) mapVal);
                 }
             } catch (BallerinaException e) {
                 sf.refRegs[j] = null;
