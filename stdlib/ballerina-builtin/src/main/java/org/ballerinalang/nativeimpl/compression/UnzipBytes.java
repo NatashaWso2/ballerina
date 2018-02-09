@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
@@ -50,25 +51,26 @@ public class UnzipBytes extends AbstractNativeFunction {
     private static final Logger log = LoggerFactory.getLogger(UnzipBytes.class);
 
     /**
-     * File content as byte array defined in ballerina.compression
+     * File content as byte array defined.
      */
     private static final int SRC_AS_BYTEARRAY_FIELD_INDEX = 0;
 
     /**
-     * File path of the destination directory defined in ballerina.compression
+     * File path of the destination directory.
      */
     private static final int DEST_PATH_FIELD_INDEX = 0;
 
     /**
-     * Decompress/unzip byte arrays/blob
+     * Decompress/unzip byte arrays/blob.
      *
      * @param fileContentAsByteArray file content as a byte arry
      * @param outputFolder           destination folder
      */
     protected static void decompress(byte[] fileContentAsByteArray, String outputFolder) {
+        ZipInputStream zin = null;
         try {
             File outdir = new File(outputFolder);
-            ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(fileContentAsByteArray));
+            zin = new ZipInputStream(new ByteArrayInputStream(fileContentAsByteArray));
             ZipEntry entry;
             String name, dir;
             while ((entry = zin.getNextEntry()) != null) {
@@ -81,37 +83,65 @@ public class UnzipBytes extends AbstractNativeFunction {
          * directory entry where is file located
          */
                 dir = dirpart(name);
-                if (dir != null)
+                if (dir != null) {
                     mkdirs(outdir, dir);
+                }
 
                 extractFile(zin, outdir, name);
             }
-            zin.close();
         } catch (IOException e) {
             log.debug("I/O Exception when processing files ", e);
             log.error("I/O Exception when processing files " + e.getMessage());
+        } finally {
+            try {
+                if (zin != null) {
+                    zin.close();
+                }
+            } catch (IOException e) {
+                log.debug("I/O Exception when closing the input stream ", e);
+                log.error("I/O Exception when closing the input stream " + e.getMessage());
+            }
         }
     }
 
     /**
-     * Extract files from the zipInputStream
+     * Extract files from the zipInputStream.
      *
-     * @param in
-     * @param outdir
+     * @param in     zipInputStream object
+     * @param outdir output directory file
      * @param name
      * @throws IOException
      */
-    private static void extractFile(ZipInputStream in, File outdir, String name) throws IOException {
+    private static void extractFile(ZipInputStream in, File outdir, String name) {
         byte[] buffer = new byte[4096];
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(new File(outdir, name)));
-        int count = -1;
-        while ((count = in.read(buffer)) != -1)
-            out.write(buffer, 0, count);
-        out.close();
+        BufferedOutputStream out = null;
+        try {
+            out = new BufferedOutputStream(new FileOutputStream(new File(outdir, name)));
+
+            int count = -1;
+            while ((count = in.read(buffer)) != -1) {
+                out.write(buffer, 0, count);
+            }
+        } catch (FileNotFoundException e) {
+            log.debug("File not found to process " + outdir, e);
+            log.error("File not found to process " + e.getMessage());
+        } catch (IOException e) {
+            log.debug("I/O Exception when closing the input stream " + outdir, e);
+            log.error("I/O Exception when closing the input stream " + e.getMessage());
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    log.debug("I/O Exception when closing the input stream ", e);
+                    log.error("I/O Exception when closing the input stream " + e.getMessage());
+                }
+            }
+        }
     }
 
     /**
-     * Create the directory name
+     * Create the directory name.
      *
      * @param name
      * @return
@@ -122,15 +152,17 @@ public class UnzipBytes extends AbstractNativeFunction {
     }
 
     /**
-     * Make directories if they doesn't exists
+     * Make directories if they doesn't exists.
      *
      * @param outdir
      * @param path
      */
-    private static void mkdirs(File outdir, String path) {
+    private static boolean mkdirs(File outdir, String path) {
         File d = new File(outdir, path);
-        if (!d.exists())
-            d.mkdirs();
+        if (!d.exists()) {
+            return d.mkdirs();
+        }
+        return false;
     }
 
     @Override

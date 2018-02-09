@@ -20,19 +20,27 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is the util class for ballerina.compression.
+ */
 public class CompressionUtils {
     private static final List<String> filesListInDir = new ArrayList<>();
 
     /**
-     * Populate all the files in a directory to a List
+     * Populate all the files in a directory to a List.
      *
      * @param dir directory with the files
      */
     public static List<String> populateFilesList(File dir) {
         File[] files = dir.listFiles();
-        for (File file : files) {
-            if (file.isFile()) filesListInDir.add(file.getAbsolutePath());
-            else populateFilesList(file);
+        if (files != null) {
+            for (File file : files) {
+                if (file.isFile()) {
+                    filesListInDir.add(file.getAbsolutePath());
+                } else {
+                    populateFilesList(file);
+                }
+            }
         }
         return filesListInDir;
     }

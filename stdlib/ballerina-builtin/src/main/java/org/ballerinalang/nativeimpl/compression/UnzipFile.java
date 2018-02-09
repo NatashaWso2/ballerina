@@ -56,7 +56,7 @@ public class UnzipFile extends AbstractNativeFunction {
     private static final int DEST_PATH_FIELD_INDEX = 1;
 
     /**
-     * Decompress/unzip compressed file
+     * Decompress/unzip compressed file.
      *
      * @param dirPath      compressed file path
      * @param outputFolder destination folder

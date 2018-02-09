@@ -58,7 +58,7 @@ public class ZipToBytes extends AbstractNativeFunction {
     private static final int SRC_PATH_FIELD_INDEX = 0;
 
     /**
-     * @param dirPath file content as a byte array
+     * @param dirPath file content as a byte array.
      */
     protected static byte[] zipToByte(String dirPath) throws IOException {
         File dir = new File(dirPath);
@@ -70,18 +70,25 @@ public class ZipToBytes extends AbstractNativeFunction {
             for (String filePath : filesListInDir) {
                 ZipEntry ze = new ZipEntry(filePath.substring(dir.getAbsolutePath().length() + 1, filePath.length()));
                 zos.putNextEntry(ze);
-                FileInputStream fis = new FileInputStream(filePath);
-                int len;
-                while ((len = fis.read(buffer)) > 0) {
-                    zos.write(buffer, 0, len);
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(filePath);
+                    int len;
+                    while ((len = fis.read(buffer)) > 0) {
+                        zos.write(buffer, 0, len);
+                    }
+                    zos.closeEntry();
+                } finally {
+                    if (fis != null) {
+                        fis.close();
+                    }
                 }
-                zos.closeEntry();
-                fis.close();
             }
-            zos.close();
         } catch (IOException e) {
             log.debug("I/O Exception when processing files ", e);
             log.error("I/O Exception when processing files " + e.getMessage());
+        } finally {
+            zos.close();
         }
         return bos.toByteArray();
 
@@ -95,7 +102,8 @@ public class ZipToBytes extends AbstractNativeFunction {
         try {
             compressedBytes = zipToByte(dirPath);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.debug("I/O Exception when processing files ", e);
+            log.error("I/O Exception when processing files " + e.getMessage());
         }
         readByteBlob = new BBlob(compressedBytes);
         return getBValues(readByteBlob);
