@@ -37,7 +37,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Native function ballerina.compression:unzipBytes.
  *
- * @since 0.8.0
+ * @since 0.961
  */
 @BallerinaFunction(
         packageName = "ballerina.compression",
