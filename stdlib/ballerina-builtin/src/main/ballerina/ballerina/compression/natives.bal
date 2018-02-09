@@ -15,3 +15,8 @@ public native function unzipFile(string dirPath, string destDir);
 @Param { value:"destDir: Destination directory to place the compressed file" }
 public native function zipFile(string dirPath, string destDir);
 
+@Description { value:"Function to compress bytes"}
+@Param {value:"dirPath: Path of the directory to be compressed"}
+@Return { value:"compressed bytes of the file" }
+public native function zipToBytes(string dirPath)(blob);
+

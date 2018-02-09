@@ -66,41 +66,71 @@ public class UnzipBytes extends AbstractNativeFunction {
      * @param outputFolder           destination folder
      */
     protected static void decompress(byte[] fileContentAsByteArray, String outputFolder) {
-        final int BUFFER = 1024;
-        int count;
-        byte data[] = new byte[BUFFER];
-        BufferedOutputStream bufferedOutputStream;
-        ByteArrayInputStream bis = new ByteArrayInputStream(fileContentAsByteArray);
-        ZipInputStream zipInputStream =
-                new ZipInputStream(bis);
-        ZipEntry zipEntry;
-        //create output directory is not exists
-        File folder = new File(outputFolder);
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
         try {
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                log.debug("Extracting: " + zipEntry);
-                File file = new File(outputFolder + zipEntry.getName());
-                if (zipEntry.isDirectory()) {
-                    file.mkdirs();
+            File outdir = new File(outputFolder);
+            ZipInputStream zin = new ZipInputStream(new ByteArrayInputStream(fileContentAsByteArray));
+            ZipEntry entry;
+            String name, dir;
+            while ((entry = zin.getNextEntry()) != null) {
+                name = entry.getName();
+                if (entry.isDirectory()) {
+                    mkdirs(outdir, name);
                     continue;
                 }
-                FileOutputStream fileOutputStream = new FileOutputStream(file, false);
-                bufferedOutputStream = new BufferedOutputStream(fileOutputStream, BUFFER);
+        /* this part is necessary because file entry can come before
+         * directory entry where is file located
+         */
+                dir = dirpart(name);
+                if (dir != null)
+                    mkdirs(outdir, dir);
 
-                while ((count = zipInputStream.read(data, 0, BUFFER)) != -1)
-                    bufferedOutputStream.write(data, 0, count);
-
-                bufferedOutputStream.flush();
-                bufferedOutputStream.close();
+                extractFile(zin, outdir, name);
             }
-            zipInputStream.close();
+            zin.close();
         } catch (IOException e) {
             log.debug("I/O Exception when processing files ", e);
             log.error("I/O Exception when processing files " + e.getMessage());
         }
+    }
+
+    /**
+     * Extract files from the zipInputStream
+     *
+     * @param in
+     * @param outdir
+     * @param name
+     * @throws IOException
+     */
+    private static void extractFile(ZipInputStream in, File outdir, String name) throws IOException {
+        byte[] buffer = new byte[4096];
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(new File(outdir, name)));
+        int count = -1;
+        while ((count = in.read(buffer)) != -1)
+            out.write(buffer, 0, count);
+        out.close();
+    }
+
+    /**
+     * Create the directory name
+     *
+     * @param name
+     * @return
+     */
+    private static String dirpart(String name) {
+        int s = name.lastIndexOf(File.separatorChar);
+        return s == -1 ? null : name.substring(0, s);
+    }
+
+    /**
+     * Make directories if they doesn't exists
+     *
+     * @param outdir
+     * @param path
+     */
+    private static void mkdirs(File outdir, String path) {
+        File d = new File(outdir, path);
+        if (!d.exists())
+            d.mkdirs();
     }
 
     @Override
