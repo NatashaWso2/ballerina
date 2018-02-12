@@ -39,7 +39,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Native function ballerina.compression:ZipToBytes.
  *
- * @since 0.961
+ * @since 0.962.0
  */
 @BallerinaFunction(
         packageName = "ballerina.compression",
@@ -60,7 +60,7 @@ public class ZipToBytes extends AbstractNativeFunction {
     /**
      * @param dirPath file content as a byte array.
      */
-    protected static byte[] zipToByte(String dirPath) throws IOException {
+    private static byte[] zipToByte(String dirPath) throws IOException {
         File dir = new File(dirPath);
         List<String> filesListInDir = CompressionUtils.populateFilesList(dir);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

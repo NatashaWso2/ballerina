@@ -32,7 +32,7 @@ import java.nio.file.Files;
 /**
  * Native function ballerina.compression:unzipFile
  *
- * @since 0.961
+ * @since 0.962.0
  */
 @BallerinaFunction(
         packageName = "ballerina.compression",

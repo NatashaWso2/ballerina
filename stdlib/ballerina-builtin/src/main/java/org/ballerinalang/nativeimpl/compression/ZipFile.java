@@ -38,7 +38,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Native function ballerina.compression:zipFile.
  *
- * @since 0.961
+ * @since 0.962.0
  */
 @BallerinaFunction(
         packageName = "ballerina.compression",
@@ -113,8 +113,7 @@ public class ZipFile extends AbstractNativeFunction {
                     fos.close();
                 }
             } catch (IOException e) {
-                log.debug("Failed or interrupted I/O operation has occured when closing the ZipOutputStream" +
-                        " ", e);
+                log.debug("Failed or interrupted I/O operation has occured when closing the ZipOutputStream", e);
                 log.error("Failed or interrupted I/O operation has occured when closing the ZipOutputStream");
             }
         }

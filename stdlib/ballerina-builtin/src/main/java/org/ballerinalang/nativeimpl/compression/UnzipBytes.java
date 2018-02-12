@@ -37,7 +37,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Native function ballerina.compression:unzipBytes.
  *
- * @since 0.961
+ * @since 0.962.0
  */
 @BallerinaFunction(
         packageName = "ballerina.compression",
@@ -79,9 +79,9 @@ public class UnzipBytes extends AbstractNativeFunction {
                     mkdirs(outdir, name);
                     continue;
                 }
-        /* this part is necessary because file entry can come before
-         * directory entry where is file located
-         */
+                /* this part is necessary because file entry can come before
+                 * directory entry where the file is located
+                 */
                 dir = dirpart(name);
                 if (dir != null) {
                     mkdirs(outdir, dir);
@@ -109,8 +109,7 @@ public class UnzipBytes extends AbstractNativeFunction {
      *
      * @param in     zipInputStream object
      * @param outdir output directory file
-     * @param name
-     * @throws IOException
+     * @param name   name of the file
      */
     private static void extractFile(ZipInputStream in, File outdir, String name) {
         byte[] buffer = new byte[4096];
@@ -143,8 +142,8 @@ public class UnzipBytes extends AbstractNativeFunction {
     /**
      * Create the directory name.
      *
-     * @param name
-     * @return
+     * @param name name of the directory
+     * @return directory name
      */
     private static String dirpart(String name) {
         int s = name.lastIndexOf(File.separatorChar);
@@ -154,15 +153,12 @@ public class UnzipBytes extends AbstractNativeFunction {
     /**
      * Make directories if they doesn't exists.
      *
-     * @param outdir
-     * @param path
+     * @param outdir destination file
+     * @param path path of the destination directory
      */
     private static boolean mkdirs(File outdir, String path) {
         File d = new File(outdir, path);
-        if (!d.exists()) {
-            return d.mkdirs();
-        }
-        return false;
+        return !d.exists() && d.mkdirs();
     }
 
     @Override
