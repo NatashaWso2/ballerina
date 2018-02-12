@@ -15,7 +15,7 @@
 *  specific language governing permissions and limitations
 *  under the License.
 */
-package org.ballerinalang.test.pull;
+package org.ballerinalang.test.push;
 
 import org.ballerinalang.test.IntegrationTestCase;
 import org.ballerinalang.test.context.BallerinaTestException;
@@ -28,9 +28,9 @@ import org.testng.annotations.Test;
 import java.io.File;
 
 /**
- * Testing ballerina pull command
+ * Testing ballerina push command
  */
-public class BallerinaPullCmdTestCase extends IntegrationTestCase {
+public class BallerinaPushCmdTestCase extends IntegrationTestCase {
 
     private ServerInstance ballerinaServer;
     private ServerInstance ballerinaClient;
@@ -39,28 +39,29 @@ public class BallerinaPullCmdTestCase extends IntegrationTestCase {
     @Test
     public void setUp() throws BallerinaTestException {
         String serverBal = new File(
-                "src" + File.separator + "test" + File.separator + "resources" + File.separator + "ballerinaPull"
-                        + File.separator + "pullServer.bal").getAbsolutePath();
+                "src" + File.separator + "test" + File.separator + "resources" + File.separator + "ballerinaPush"
+                        + File.separator + "pushServer.bal").getAbsolutePath();
         ballerinaServer = ServerInstance.initBallerinaServer();
         ballerinaServer.startBallerinaServer(serverBal);
     }
 
-    @Test(description = "Test ballerina pull cmd")
-    public void testBallerinaPullCmd() throws Exception {
+    @Test(description = "Test ballerina push cmd")
+    public void testBallerinaPushCmd() throws Exception {
         serverZipPath = System.getProperty(Constant.SYSTEM_PROP_SERVER_ZIP);
         String srcDirPath = new File("src" + File.separator + "test" + File.separator + "resources"
-                + File.separator + "ballerinaPull" + File.separator + "files" + File.separator
-                + "hello.zip").getAbsolutePath();
+                + File.separator + "ballerinaPush" + File.separator + "files").getAbsolutePath();
         String destDirPath = new File("src" + File.separator + "test" + File.separator + "resources"
-                + File.separator + "ballerinaPull" + File.separator + "files").getAbsolutePath();
+                + File.separator + "ballerinaPush" + File.separator + "files" + File.separator +
+        "ballerina").getAbsolutePath();
         String[] clientArgs = {new File("src" + File.separator + "test" + File.separator + "resources"
-                + File.separator + "ballerinaPull" + File.separator + "pullClient.bal").getAbsolutePath(),
+                + File.separator + "ballerinaPush" + File.separator + "pushClient.bal").getAbsolutePath(),
                 srcDirPath, destDirPath};
 
         ballerinaClient = new ServerInstance(serverZipPath);
         ballerinaClient.runMain(clientArgs);
 
-        File file = new File(destDirPath + File.separator + "hello.txt");
+        File file = new File(destDirPath + File.separator + "foo" + File.separator + "bar" +
+                File.separator + "my.bal");
         Assert.assertEquals(file.exists() && !file.isDirectory(), true);
     }
 
