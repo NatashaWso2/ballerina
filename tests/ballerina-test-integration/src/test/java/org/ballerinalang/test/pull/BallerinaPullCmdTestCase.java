@@ -21,8 +21,7 @@ import org.ballerinalang.test.IntegrationTestCase;
 import org.ballerinalang.test.context.BallerinaTestException;
 import org.ballerinalang.test.context.Constant;
 import org.ballerinalang.test.context.ServerInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 
@@ -33,7 +32,6 @@ import java.io.File;
  */
 public class BallerinaPullCmdTestCase extends IntegrationTestCase {
 
-    private static final Logger log = LoggerFactory.getLogger(BallerinaPullCmdTestCase.class);
     private ServerInstance ballerinaServer;
     private ServerInstance ballerinaClient;
     private String serverZipPath;
@@ -50,10 +48,20 @@ public class BallerinaPullCmdTestCase extends IntegrationTestCase {
     @Test(description = "Test ballerina pull cmd")
     public void testMutualSSL() throws Exception {
         serverZipPath = System.getProperty(Constant.SYSTEM_PROP_SERVER_ZIP);
+        String srcDirPath = new File("src" + File.separator + "test" + File.separator + "resources"
+                + File.separator + "ballerinaPull" + File.separator + "files" + File.separator
+                + "hello.zip").getAbsolutePath();
+        String destDirPath = new File("src" + File.separator + "test" + File.separator + "resources"
+                + File.separator + "ballerinaPull" + File.separator + "files").getAbsolutePath();
         String[] clientArgs = {new File("src" + File.separator + "test" + File.separator + "resources"
-                + File.separator + "ballerinaPull" + File.separator + "pullClient.bal").getAbsolutePath()};
+                + File.separator + "ballerinaPull" + File.separator + "pullClient.bal").getAbsolutePath(),
+                srcDirPath, destDirPath};
+
         ballerinaClient = new ServerInstance(serverZipPath);
         ballerinaClient.runMain(clientArgs);
+
+        File file = new File(destDirPath + File.separator + "hello.txt");
+        Assert.assertEquals(file.exists() && !file.isDirectory(), true);
     }
 
     @AfterClass

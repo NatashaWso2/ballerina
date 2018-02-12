@@ -13,13 +13,13 @@ service<http> echo {
     }
     resource echo (http:Connection conn, http:InRequest req) {
         http:OutResponse res = {};
-        string srcFilePath = "/home/natasha/Documents/github_repos/ballerina/tests/ballerina-test-integration/src/test/resources/ballerinaPull/files/hello.zip";
+        json reqPayload = req.getJsonPayload();
+        string srcFilePath = reqPayload.payload.toString();
         io:ByteChannel src = getFileChannel(srcFilePath, "r");
         int bytesChunk = 10000;
         blob contentAsBytes = readBytes(src, bytesChunk);
         res.setBinaryPayload(contentAsBytes);
         _ = conn.respond(res);
-        println("successful");
     }
 }
 

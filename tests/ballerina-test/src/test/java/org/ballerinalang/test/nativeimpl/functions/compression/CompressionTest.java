@@ -138,6 +138,12 @@ public class CompressionTest {
         return pathValue;
     }
 
+    /**
+     * Get files inside the zip file
+     * @param zipFilePath path of the zip file
+     * @return list of files available inside the zipped file
+     * @throws IOException
+     */
     public ArrayList<String> getFilesInsideZip(String zipFilePath) throws IOException {
         ArrayList<String> filesContained = new ArrayList<>();
         ZipFile zipFile = new ZipFile(zipFilePath);
