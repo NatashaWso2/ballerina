@@ -78,16 +78,9 @@ public class ZipToBytes extends AbstractNativeFunction {
     }
 
     /**
-<<<<<<< 3f6582663923b4622d2c91ac37472e425a8c9aa1
      * Add file inside the src directory to the ZipOutputStream.
-     *
-     * @param zos      ZipOutputStream
-     * @param buffer   byte buffer
-=======
-     * Add each entry (file) to the ZipOutputStream.
      * @param zos ZipOutputStream
      * @param buffer byte buffer
->>>>>>> Add missing doc annotations to function
      * @param filePath file path of each file inside the driectory
      */
     private static void addEntry(ZipOutputStream zos, byte[] buffer, String filePath) {
