@@ -47,7 +47,7 @@ public class NetworkUtils {
         compileResult = compilePullCmdBalFile("ballerina.pull");
         Path targetDirectoryPath = UserRepositoryUtils.initializeUserRepository()
                 .resolve(USER_REPO_ARTIFACTS_DIRNAME).resolve(USER_REPO_SRC_DIRNAME);
-        String ballerinaCentralRepoURL = "http://52.54.136.13:9090/p/";
+        String ballerinaCentralRepoURL = "http://0.0.0.0:9090/p/";
         String dstPath = targetDirectoryPath.toString();
         String resourcePath = ballerinaCentralRepoURL + resourceName;
 
@@ -61,7 +61,7 @@ public class NetworkUtils {
      */
     public static void pushPackages(String resourceName) {
         compileResult = compilePullCmdBalFile("ballerina.push");
-        String ballerinaCentralRepoURL = "http://52.54.136.13:9090/p/" + resourceName + "/1.0.0";
+        String ballerinaCentralRepoURL = "http://0.0.0.0:9090/p/" + resourceName + "/1.0.0";
         String[] arguments = new String[]{ballerinaCentralRepoURL, resourceName};
         LauncherUtils.runMain(compileResult.getProgFile(), arguments);
     }
