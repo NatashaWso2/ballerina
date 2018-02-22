@@ -21,7 +21,7 @@ import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.ballerinalang.launcher.toml.model.Manifest;
+import org.ballerinalang.launcher.toml.model.ManifestDoc;
 import org.ballerinalang.launcher.toml.util.TomlProcessor;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class ManifestProcessor {
      * @return charstream object
      * @throws IOException exception if the file cannot be found
      */
-    public static Manifest parseTomlContentFromFile(String fileName) throws IOException {
+    public static ManifestDoc parseTomlContentFromFile(String fileName) throws IOException {
         ANTLRFileStream in = new ANTLRFileStream(fileName);
         return getManifest(in);
     }
@@ -49,7 +49,7 @@ public class ManifestProcessor {
      * @param content toml file content as a string
      * @return charstream object
      */
-    public static Manifest parseTomlContentFromString(String content) {
+    public static ManifestDoc parseTomlContentFromString(String content) {
         ANTLRInputStream in = new ANTLRInputStream(content);
         return getManifest(in);
     }
@@ -60,8 +60,8 @@ public class ManifestProcessor {
      * @param charStream toml file content as a char stream
      * @return manifest object
      */
-    public static Manifest getManifest(CharStream charStream) {
-        Manifest manifest = new Manifest();
+    public static ManifestDoc getManifest(CharStream charStream) {
+        ManifestDoc manifest = new ManifestDoc();
         ParseTreeWalker walker = new ParseTreeWalker();
         walker.walk(new ManifestBuildListener(manifest), TomlProcessor.parseTomlContent(charStream));
         return manifest;

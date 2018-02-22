@@ -1,0 +1,93 @@
+/*
+ *  Copyright (c) 2018, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ *  WSO2 Inc. licenses this file to you under the Apache License,
+ *  Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing,
+ *  software distributed under the License is distributed on an
+ *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ *  KIND, either express or implied.  See the License for the
+ *  specific language governing permissions and limitations
+ *  under the License.
+ */
+package org.ballerinalang.launcher.toml.model.fields;
+
+
+import org.ballerinalang.launcher.toml.model.ManifestDoc;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+
+/**
+ * Fields defined in the manifest "package" header.
+ */
+public enum ProjectField {
+    NAME(ManifestDoc::setName),
+    VERSION(ManifestDoc::setVersion);
+
+    public static final Map<String, ProjectField> LOOKUP = new HashMap<>();
+
+    static {
+        for (ProjectField packageFieldField : ProjectField.values()) {
+            LOOKUP.put(packageFieldField.name().toLowerCase(), packageFieldField);
+        }
+    }
+
+    private BiConsumer<ManifestDoc, String> stringSetter;
+    private BiConsumer<ManifestDoc, List<String>> listSetter;
+
+    /**
+     * Constructor which sets the string value.
+     *
+     * @param stringSetter value to be set
+     */
+    ProjectField(BiConsumer<ManifestDoc, String> stringSetter) {
+        this(stringSetter, null);
+    }
+
+    /**
+     * Constructor which sets a list of strings.
+     *
+     * @param stringSetter string to be set: will be always null
+     * @param listSetter   list of strings
+     */
+    ProjectField(BiConsumer<ManifestDoc, String> stringSetter, BiConsumer<ManifestDoc, List<String>> listSetter) {
+        this.stringSetter = stringSetter;
+        this.listSetter = listSetter;
+    }
+
+    /**
+     * Set the string value to the manifest object.
+     *
+     * @param manifest manifest object
+     * @param value    string value
+     */
+    public void setStringTo(ManifestDoc manifest, String value) {
+        if (stringSetter != null) {
+            stringSetter.accept(manifest, value);
+        } else {
+            throw new IllegalStateException(this + " field can't have string value " + value);
+        }
+    }
+
+    /**
+     * Set the list of strings to the manifest object.
+     *
+     * @param manifest manifest object
+     * @param list     list of strings
+     */
+    public void setListTo(ManifestDoc manifest, List<String> list) {
+        if (listSetter != null) {
+            listSetter.accept(manifest, list);
+        } else {
+            throw new IllegalStateException(this + " field can't have list value " + list.toString());
+        }
+    }
+}

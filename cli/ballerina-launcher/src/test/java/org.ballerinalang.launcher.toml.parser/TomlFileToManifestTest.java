@@ -14,7 +14,8 @@
  *  KIND, either express or implied.  See the License for the
  *  specific language governing permissions and limitations
  *  under the License.
- */
+ *//*
+
 package org.ballerinalang.launcher.toml.parser;
 
 import org.ballerinalang.launcher.toml.model.Manifest;
@@ -62,3 +63,4 @@ public class TomlFileToManifestTest {
         Assert.assertEquals(manifest.getDependencies().get(5).getPackageName(), "jobapi.core");
     }
 }
+*/

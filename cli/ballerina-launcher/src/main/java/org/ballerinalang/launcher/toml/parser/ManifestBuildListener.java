@@ -21,9 +21,9 @@ import org.antlr.v4.runtime.RuleContext;
 import org.ballerinalang.launcher.toml.antlr4.TomlBaseListener;
 import org.ballerinalang.launcher.toml.antlr4.TomlParser;
 import org.ballerinalang.launcher.toml.model.Dependency;
-import org.ballerinalang.launcher.toml.model.Manifest;
+import org.ballerinalang.launcher.toml.model.ManifestDoc;
 import org.ballerinalang.launcher.toml.model.fields.DependencyField;
-import org.ballerinalang.launcher.toml.model.fields.PackageField;
+import org.ballerinalang.launcher.toml.model.fields.ProjectField;
 import org.ballerinalang.launcher.toml.model.fields.Section;
 import org.ballerinalang.launcher.toml.util.SingletonStack;
 
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  * Custom listener which is extended from the Toml listener with our own custom logic.
  */
 public class ManifestBuildListener extends TomlBaseListener {
-    private final Manifest manifest;
+    private final ManifestDoc manifest;
     private Dependency dependency;
     private String currentHeader = null;
     private SingletonStack currentKey = new SingletonStack();
@@ -45,7 +45,7 @@ public class ManifestBuildListener extends TomlBaseListener {
      *
      * @param manifest manifest object
      */
-    ManifestBuildListener(Manifest manifest) {
+    ManifestBuildListener(ManifestDoc manifest) {
         this.manifest = manifest;
     }
 
@@ -153,10 +153,10 @@ public class ManifestBuildListener extends TomlBaseListener {
      * @param value KeyvalContext object
      */
     private void setToManifest(String value) {
-        if (currentKey.present() && Section.PACKAGE.stringEquals(currentHeader)) {
-            PackageField packageFieldField = PackageField.LOOKUP.get(currentKey.pop());
-            if (packageFieldField != null) {
-                packageFieldField.setStringTo(this.manifest, value);
+        if (currentKey.present() && Section.PROJECT.stringEquals(currentHeader)) {
+            ProjectField projectField = ProjectField.LOOKUP.get(currentKey.pop());
+            if (projectField != null) {
+                projectField.setStringTo(this.manifest, value);
             }
         } else if (currentKey.present() && (Section.DEPENDENCIES.stringEquals(currentHeader) ||
                 Section.PATCHES.stringEquals(currentHeader))) {
@@ -173,11 +173,13 @@ public class ManifestBuildListener extends TomlBaseListener {
      * @param arrayValuesContext ArrayValuesContext object
      */
     private void setToManifest(TomlParser.ArrayValuesContext arrayValuesContext) {
-        if (currentKey.present() && Section.PACKAGE.stringEquals(currentHeader)) {
-            PackageField packageFieldField = PackageField.LOOKUP.get(currentKey.pop());
-            if (packageFieldField != null) {
-                List<String> arrayElements = populateList(arrayValuesContext);
-                packageFieldField.setListTo(this.manifest, arrayElements);
+        if (currentKey.present()) {
+            if (Section.PROJECT.stringEquals(currentHeader)) {
+                ProjectField projectField = ProjectField.LOOKUP.get(currentKey.pop());
+                if (projectField != null) {
+                    List<String> arrayElements = populateList(arrayValuesContext);
+                    projectField.setListTo(this.manifest, arrayElements);
+                }
             }
         }
     }
@@ -218,12 +220,13 @@ public class ManifestBuildListener extends TomlBaseListener {
      * @param ctx InlineTableKeyvalsContext object
      */
     private void setToManifest(TomlParser.InlineTableKeyvalsContext ctx) {
-        if (currentKey.present() &&
-                (Section.DEPENDENCIES.stringEquals(currentHeader) ||
-                        Section.PATCHES.stringEquals(currentHeader))) {
-            createDependencyObject(String.valueOf(currentKey.pop()));
-            if (ctx != null) {
-                populateDependencyField(ctx);
+        if (currentKey.present()) {
+            if ((Section.DEPENDENCIES.stringEquals(currentHeader) ||
+                    Section.PATCHES.stringEquals(currentHeader))) {
+                createDependencyObject(String.valueOf(currentKey.pop()));
+                if (ctx != null) {
+                    populateDependencyField(ctx);
+                }
             }
         }
     }
