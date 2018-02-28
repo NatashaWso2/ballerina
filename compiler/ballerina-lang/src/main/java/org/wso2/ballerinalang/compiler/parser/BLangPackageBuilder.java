@@ -955,6 +955,7 @@ public class BLangPackageBuilder {
 
         BLangPackageDeclaration pkgDcl = (BLangPackageDeclaration) TreeBuilder.createPackageDeclarationNode();
         pkgDcl.pos = pos;
+        // TODO: orgname is null, fix it.
         pkgDcl.addWS(ws);
         pkgDcl.pkgNameComps = pkgNameComps;
         pkgDcl.version = versionNode;
@@ -963,6 +964,7 @@ public class BLangPackageBuilder {
 
     public void addImportPackageDeclaration(DiagnosticPos pos,
                                             Set<Whitespace> ws,
+                                            String orgName,
                                             List<String> nameComps,
                                             String version,
                                             String alias) {
@@ -979,6 +981,7 @@ public class BLangPackageBuilder {
         importDcl.addWS(ws);
         importDcl.pkgNameComps = pkgNameComps;
         importDcl.version = versionNode;
+        importDcl.orgName = (BLangIdentifier) this.createIdentifier(orgName);
         importDcl.alias = aliasNode;
         this.compUnit.addTopLevelNode(importDcl);
         if (this.imports.contains(importDcl)) {
