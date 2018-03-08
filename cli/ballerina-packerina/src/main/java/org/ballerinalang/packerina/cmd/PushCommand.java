@@ -37,7 +37,7 @@ import static org.ballerinalang.runtime.Constants.SYSTEM_PROP_BAL_DEBUG;
 @Parameters(commandNames = "push", commandDescription = " uploads/pushes a package source and binaries available" +
         "locally to the ballerina central repository,")
 public class PushCommand implements BLauncherCmd {
-    private static final String BALLERINA_CENTRAL_REPO_URL = "http://staging.central.ballerina.io:9090/p/";
+    private static final String BALLERINA_CENTRAL_REPO_URL = "http://staging.central.ballerina.io:9090/";
     private static PrintStream outStream = System.err;
     private JCommander parentCmdParser;
 
