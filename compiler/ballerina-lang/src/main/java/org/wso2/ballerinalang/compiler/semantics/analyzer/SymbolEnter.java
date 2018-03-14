@@ -921,7 +921,7 @@ public class SymbolEnter extends BLangNodeVisitor {
     }
 
     private void createPackageInitFunction(BLangPackage pkgNode) {
-        BLangFunction initFunction = createInitFunction(pkgNode.pos, pkgNode.symbol.getName().getValue());
+        BLangFunction initFunction = createInitFunction(pkgNode.pos, pkgNode.symbol.pkgID.bvmAlias());
         pkgNode.initFunction = initFunction;
     }
 

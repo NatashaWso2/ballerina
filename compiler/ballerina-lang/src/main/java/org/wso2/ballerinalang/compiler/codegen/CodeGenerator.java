@@ -194,6 +194,7 @@ import org.wso2.ballerinalang.programfile.cpentries.TypeRefCPEntry;
 import org.wso2.ballerinalang.programfile.cpentries.UTF8CPEntry;
 import org.wso2.ballerinalang.programfile.cpentries.WorkerDataChannelRefCPEntry;
 
+import javax.xml.XMLConstants;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -202,18 +203,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
-import javax.xml.XMLConstants;
 
-import static org.wso2.ballerinalang.compiler.codegen.CodeGenerator.VariableIndex.Kind.FIELD;
-import static org.wso2.ballerinalang.compiler.codegen.CodeGenerator.VariableIndex.Kind.LOCAL;
-import static org.wso2.ballerinalang.compiler.codegen.CodeGenerator.VariableIndex.Kind.PACKAGE;
-import static org.wso2.ballerinalang.compiler.codegen.CodeGenerator.VariableIndex.Kind.REG;
-import static org.wso2.ballerinalang.programfile.ProgramFileConstants.BLOB_OFFSET;
-import static org.wso2.ballerinalang.programfile.ProgramFileConstants.BOOL_OFFSET;
-import static org.wso2.ballerinalang.programfile.ProgramFileConstants.FLOAT_OFFSET;
-import static org.wso2.ballerinalang.programfile.ProgramFileConstants.INT_OFFSET;
-import static org.wso2.ballerinalang.programfile.ProgramFileConstants.REF_OFFSET;
-import static org.wso2.ballerinalang.programfile.ProgramFileConstants.STRING_OFFSET;
+import static org.wso2.ballerinalang.compiler.codegen.CodeGenerator.VariableIndex.Kind.*;
+import static org.wso2.ballerinalang.programfile.ProgramFileConstants.*;
 
 /**
  * Generates Ballerina bytecode by visiting the AST.
@@ -397,7 +389,8 @@ public class CodeGenerator extends BLangNodeVisitor {
         BPackageSymbol pkgSymbol = pkgNode.symbol;
         currentPkgID = pkgSymbol.pkgID;
         currentPkgInfo = packageInfo;
-        currentPkgInfo.nameCPIndex = addUTF8CPEntry(currentPkgInfo, currentPkgID.name.value);
+        currentPkgInfo.nameCPIndex = addUTF8CPEntry(currentPkgInfo, currentPkgID.getOrgName().getValue() + "."
+                +currentPkgID.name.value);
         currentPkgInfo.versionCPIndex = addUTF8CPEntry(currentPkgInfo, currentPkgID.version.value);
 
         // Insert the package reference to the constant pool of the current package
@@ -2125,7 +2118,7 @@ public class CodeGenerator extends BLangNodeVisitor {
     }
 
     private int addPackageRefCPEntry(ConstantPool pool, PackageID pkgID) {
-        int nameCPIndex = addUTF8CPEntry(pool, pkgID.name.value);
+        int nameCPIndex = addUTF8CPEntry(pool, pkgID.orgName.value + "." + pkgID.name.value);
         int versionCPIndex = addUTF8CPEntry(pool, pkgID.version.value);
         PackageRefCPEntry packageRefCPEntry = new PackageRefCPEntry(nameCPIndex, versionCPIndex);
         return pool.addCPEntry(packageRefCPEntry);

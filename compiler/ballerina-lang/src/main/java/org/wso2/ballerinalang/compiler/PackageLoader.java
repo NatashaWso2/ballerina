@@ -290,7 +290,7 @@ public class PackageLoader {
         });
 
         BLangIdentifier orgNameNode = (BLangIdentifier) TreeBuilder.createIdentifierNode();
-        orgNameNode.setValue(Names.ANON_ORG.value);
+        orgNameNode.setValue(Names.BUILTIN_ORG.value);
         BLangIdentifier versionNode = (BLangIdentifier) TreeBuilder.createIdentifierNode();
         versionNode.setValue(Names.DEFAULT_VERSION.value);
         BLangImportPackage importDcl = (BLangImportPackage) TreeBuilder.createImportPackageNode();

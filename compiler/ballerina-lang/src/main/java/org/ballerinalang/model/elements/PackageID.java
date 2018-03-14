@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 public class PackageID {
 
     public static final PackageID DEFAULT = new PackageID(Names.ANON_ORG, Names.DEFAULT_PACKAGE, Names.DEFAULT_VERSION);
-    private final Name orgName;
+    public final Name orgName;
     public Name name;
     public Name version = Names.DEFAULT_VERSION;
 
@@ -119,14 +119,19 @@ public class PackageID {
 
     @Override
     public String toString() {
+        System.out.println("* * * * * * ** * * * * *");
         if (version == Names.DEFAULT_VERSION) {
-            return this.name.value;
+            return this.orgName +" / " + this.name.value;
         }
 
-        return this.name + "[" + this.version + "]";
+        return this.orgName +" / " + this.name + "[" + this.version + "]";
     }
 
     public Name getOrgName() {
         return orgName;
+    }
+
+    public String bvmAlias() {
+        return this.orgName + "." + this.getName();
     }
 }

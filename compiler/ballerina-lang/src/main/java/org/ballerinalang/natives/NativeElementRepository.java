@@ -33,12 +33,12 @@ public class NativeElementRepository {
     private Map<String, NativeActionDef> nativeActionEntries = new HashMap<>();
     
     public void registerNativeFunction(NativeFunctionDef nativeFuncDef) {
-        this.nativeFuncEntries.put(functionToKey(nativeFuncDef.getPkgName(), 
+        this.nativeFuncEntries.put(functionToKey(nativeFuncDef.getOrgName() + "." + nativeFuncDef.getPkgName(),
                 nativeFuncDef.getCallableName()), nativeFuncDef);
     }
     
     public void registerNativeAction(NativeActionDef nativeActionDef) {
-        this.nativeActionEntries.put(actionToKey(nativeActionDef.getPkgName(), 
+        this.nativeActionEntries.put(actionToKey(nativeActionDef.getOrgName() + "." + nativeActionDef.getPkgName(),
                 nativeActionDef.getConnectorName(), nativeActionDef.getCallableName()), nativeActionDef);
     }
     
@@ -88,7 +88,7 @@ public class NativeElementRepository {
         }
 
         public String getOrgName() {
-            return pkgName;
+            return orgName;
         }
 
         public String getPkgName() {
