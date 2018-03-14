@@ -156,7 +156,7 @@ public class PackageLoader {
                 throw new IllegalArgumentException("cannot resolve file '" + source + "'");
             }
         } else {
-            pkgId = getPackageID(source);
+            pkgId = getPackageID(null, source);
             bLangPackage = packageCache.get(pkgId);
             if (bLangPackage != null) {
                 return bLangPackage;
@@ -220,7 +220,7 @@ public class PackageLoader {
                 throw new IllegalArgumentException("cannot resolve file '" + source + "'");
             }
         } else {
-            pkgId = getPackageID(source);
+            pkgId = getPackageID(null, source);
             pkgEntity = getPackageEntity(pkgId);
             bLangPackage = loadPackageFromEntity(pkgId, pkgEntity);
             if (bLangPackage == null) {
@@ -236,9 +236,9 @@ public class PackageLoader {
         return bLangPackage;
     }
 
-    public BLangPackage loadAndDefinePackage(String sourcePkg) {
+    public BLangPackage loadAndDefinePackage(String orgName, String sourcePkg) {
         // TODO This is used only to load the builtin package.
-        PackageID pkgId = getPackageID(sourcePkg);
+        PackageID pkgId = getPackageID(orgName, sourcePkg);
         return loadAndDefinePackage(pkgId);
     }
 
@@ -311,10 +311,16 @@ public class PackageLoader {
         return loadPackageEntity(pkgId);
     }
 
-    private PackageID getPackageID(String sourcePkg) {
+    private PackageID getPackageID(String org, String sourcePkg) {
         // split from '.', '\' and '/'
         List<Name> pkgNameComps = getPackageNameComps(sourcePkg);
-        return new PackageID(Names.ANON_ORG, pkgNameComps, Names.DEFAULT_VERSION);
+        Name orgName;
+        if (org == null) {
+            orgName = new Name(Names.ANON_ORG.getValue());
+        } else {
+            orgName = new Name(org);
+        }
+        return new PackageID(orgName, pkgNameComps, Names.DEFAULT_VERSION);
     }
 
     private List<Name> getPackageNameComps(String sourcePkg) {

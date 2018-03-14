@@ -46,6 +46,7 @@ public class Names {
     public static final Name CONNECTOR = new Name("connector");
     // TODO remove when current project name is read from manifest
     public static final Name ANON_ORG = new Name("$anon");
+    public static final Name BUILTIN_ORG = new Name("ballerina");
 
     public CompilerContext context;
 

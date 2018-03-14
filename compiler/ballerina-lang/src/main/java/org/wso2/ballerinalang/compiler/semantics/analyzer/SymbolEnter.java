@@ -97,11 +97,11 @@ import org.wso2.ballerinalang.compiler.util.diagnotic.BLangDiagnosticLog;
 import org.wso2.ballerinalang.compiler.util.diagnotic.DiagnosticPos;
 import org.wso2.ballerinalang.util.Flags;
 
+import javax.xml.XMLConstants;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.xml.XMLConstants;
 
 import static org.ballerinalang.model.tree.NodeKind.IMPORT;
 
@@ -287,6 +287,14 @@ public class SymbolEnter extends BLangNodeVisitor {
         List<Name> nameComps = importPkgNode.pkgNameComps.stream()
                 .map(identifier -> names.fromIdNode(identifier))
                 .collect(Collectors.toList());
+        // ToDo remove this after org-name correctly works
+        // If the package starts with ballerina.* we add the org-name of the package as "ballerina"
+        if (nameComps.get(0).getValue().equals("ballerina")) {
+            if (orgName.equals(Names.ANON_ORG) || orgName.getValue().isEmpty()) {
+                orgName = Names.BUILTIN_ORG;
+            }
+        }
+
         PackageID pkgId = new PackageID(orgName, nameComps, names.fromIdNode(importPkgNode.version));
         if (pkgId.name.getValue().startsWith(Names.BUILTIN_PACKAGE.value)) {
             dlog.error(importPkgNode.pos, DiagnosticCode.PACKAGE_NOT_FOUND,
@@ -548,6 +556,9 @@ public class SymbolEnter extends BLangNodeVisitor {
         if (pkgNode.pkgDecl == null) {
             pSymbol = new BPackageSymbol(PackageID.DEFAULT, symTable.rootPkgSymbol);
         } else {
+            BLangIdentifier orgNameNode = new BLangIdentifier();
+            orgNameNode.setValue(pkgNode.packageID.getOrgName().getValue());
+            pkgNode.pkgDecl.orgName = orgNameNode;
             PackageID pkgID = NodeUtils.getPackageID(names,
                     pkgNode.pkgDecl.orgName, pkgNode.pkgDecl.pkgNameComps, pkgNode.pkgDecl.version);
             pSymbol = new BPackageSymbol(pkgID, symTable.rootPkgSymbol);
