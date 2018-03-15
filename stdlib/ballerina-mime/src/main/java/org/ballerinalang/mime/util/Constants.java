@@ -138,7 +138,7 @@ public class Constants {
     public static final String COMMA = ",";
     public static final String ASSIGNMENT = "=";
     public static final String PARSER_ERROR = "failed to parse: ";
-    public static final String BUILTIN_PACKAGE = "builtin";
+    public static final String BUILTIN_PACKAGE = "ballerina.builtin";
     public static final String STRUCT_GENERIC_ERROR = "error";
     public static final String CONTENT_DISPOSITION_FILE_NAME = "filename";
     public static final String CONTENT_DISPOSITION_NAME = "name";

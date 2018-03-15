@@ -42,6 +42,7 @@ import org.wso2.ballerinalang.compiler.util.CompilerContext;
 import org.wso2.ballerinalang.compiler.util.CompilerOptions;
 import org.wso2.ballerinalang.compiler.util.Name;
 import org.wso2.ballerinalang.compiler.util.Names;
+import org.wso2.ballerinalang.compiler.util.ProjectDirs;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -135,59 +136,18 @@ public class PackageLoader {
         return systemList.toArray(new RepoHierarchyBuilder.RepoNode[systemList.size()]);
     }
 
-    public BLangPackage loadPackage(String source, PackageRepository packageRepo) {
-        if (source == null || source.isEmpty()) {
-            throw new IllegalArgumentException("source package/file cannot be null");
-        }
-
-        // TODO Clean up this code.
-        PackageEntity pkgEntity;
-        PackageID pkgId = PackageID.DEFAULT;
-        BLangPackage bLangPackage;
-        if (source.endsWith(PackageEntity.Kind.SOURCE.getExtension())) {
-            bLangPackage = packageCache.get(pkgId);
-            if (bLangPackage != null) {
-                return bLangPackage;
-            }
-
-            pkgEntity = loadPackageEntity(pkgId);
-            bLangPackage = loadPackageFromEntity(pkgId, pkgEntity); //loadPackage(pkgId, pkgEntity);
-            if (bLangPackage == null) {
-                throw new IllegalArgumentException("cannot resolve file '" + source + "'");
-            }
-        } else {
-            pkgId = getPackageID(null, source);
-            bLangPackage = packageCache.get(pkgId);
-            if (bLangPackage != null) {
-                return bLangPackage;
-            }
-
-            pkgEntity = getPackageEntity(pkgId);
-            bLangPackage = loadPackageFromEntity(pkgId, pkgEntity); // loadPackage(pkgId, pkgEntity);
-            if (bLangPackage == null) {
-                throw new IllegalArgumentException("cannot resolve package '" + source + "'");
-            }
-        }
-
-        // Add runtime.
-        addImportPkg(bLangPackage, Names.RUNTIME_PACKAGE.value);
-        return bLangPackage;
-    }
-
-    private PackageEntity loadPackageEntity(PackageID pkgId, String value) {
-        return loadPackageEntity(pkgId);
-    }
-
     private PackageEntity loadPackageEntity(PackageID pkgId) {
         Resolution resolution = repos.resolve(pkgId);
         if (resolution == Resolution.NOT_FOUND) {
-            throw new RuntimeException("Package not found " + pkgId);
+            return null;
         }
-        return pathToEntity(pkgId, resolution);
+        return new PathListPackageSource(pkgId, resolution.paths, resolution.resolvedBy);
     }
 
-    private PackageEntity pathToEntity(PackageID pkgId, Resolution resolution) {
-        return new PathListPackageSource(pkgId, resolution.paths, resolution.resolvedBy);
+    public BLangPackage loadPackage(PackageID pkgId) {
+        BLangPackage packageNode = loadPackage(pkgId, null);
+        addImportPkg(packageNode,Names.BUILTIN_ORG.value, Names.RUNTIME_PACKAGE.value);
+        return packageNode;
     }
 
     public BLangPackage loadPackage(PackageID pkgId, PackageRepository packageRepo) {
@@ -196,49 +156,16 @@ public class PackageLoader {
             return bLangPackage;
         }
 
-        return loadPackageFromEntity(pkgId, getPackageEntity(pkgId)); // loadPackage(pkgId, getPackageEntity(pkgId));
-    }
-
-    public BLangPackage loadPackage(PackageID pkgId) {
-        BLangPackage packageNode = loadPackage(pkgId, null);
-        addImportPkg(packageNode, Names.RUNTIME_PACKAGE.value);
+        BLangPackage packageNode = loadPackageFromEntity(pkgId, loadPackageEntity(pkgId));
+        if (packageNode == null) {
+            throw ProjectDirs.getPackageNotFoundError(pkgId);
+        }
         return packageNode;
     }
 
-    public BLangPackage loadEntryPackage(String source) {
-        if (source == null || source.isEmpty()) {
-            throw new IllegalArgumentException("source package/file cannot be null");
-        }
-
-        PackageEntity pkgEntity;
-        PackageID pkgId = PackageID.DEFAULT;
-        BLangPackage bLangPackage;
-        if (source.endsWith(PackageEntity.Kind.SOURCE.getExtension())) {
-            pkgEntity = loadPackageEntity(pkgId);
-            bLangPackage = loadPackageFromEntity(pkgId, pkgEntity); // loadPackage(pkgId, pkgEntity);
-            if (bLangPackage == null) {
-                throw new IllegalArgumentException("cannot resolve file '" + source + "'");
-            }
-        } else {
-            pkgId = getPackageID(null, source);
-            pkgEntity = getPackageEntity(pkgId);
-            bLangPackage = loadPackageFromEntity(pkgId, pkgEntity);
-            if (bLangPackage == null) {
-                throw new IllegalArgumentException("cannot resolve package '" + source + "'");
-            }
-        }
-
-        // Add runtime.
-        addImportPkg(bLangPackage, Names.RUNTIME_PACKAGE.value);
-
-        // Define Package
-        this.symbolEnter.definePackage(bLangPackage, pkgId);
-        return bLangPackage;
-    }
-
-    public BLangPackage loadAndDefinePackage(String orgName, String sourcePkg) {
+    public BLangPackage loadAndDefinePackage(String sourcePkg) {
         // TODO This is used only to load the builtin package.
-        PackageID pkgId = getPackageID(orgName, sourcePkg);
+        PackageID pkgId = getPackageID(sourcePkg); //TODO: fix
         return loadAndDefinePackage(pkgId);
     }
 
@@ -258,7 +185,7 @@ public class PackageLoader {
             return null;
         }
 
-        this.symbolEnter.definePackage(bLangPackage, pkgId);
+        this.symbolEnter.definePackage(bLangPackage);
         return bLangPackage;
     }
 
@@ -275,10 +202,6 @@ public class PackageLoader {
 
 
     // Private methods
-
-    private BLangPackage sourceCompile(PackageSource pkgSource) {
-        return this.parser.parse(pkgSource);
-    }
 
     private void addImportPkg(BLangPackage bLangPackage, String sourcePkgName) {
         List<Name> nameComps = getPackageNameComps(sourcePkgName);
@@ -302,13 +225,6 @@ public class PackageLoader {
         alias.setValue(names.merge(Names.DOT, nameComps.get(nameComps.size() - 1)).value);
         importDcl.alias = alias;
         bLangPackage.imports.add(importDcl);
-    }
-
-    private PackageEntity getPackageEntity(PackageID pkgId) {
-        if (pkgId.isUnnamed) {
-            return loadPackageEntity(pkgId, pkgId.sourceFileName.value);
-        }
-        return loadPackageEntity(pkgId);
     }
 
     private PackageID getPackageID(String org, String sourcePkg) {
@@ -340,4 +256,7 @@ public class PackageLoader {
         return bLangPackage;
     }
 
+    private BLangPackage sourceCompile(PackageSource pkgSource) {
+        return this.parser.parse(pkgSource);
+    }
 }
