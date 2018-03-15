@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.transactions.coordinator;
+package transactions.coordinator;
 
 import ballerina/caching;
 import ballerina/log;

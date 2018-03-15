@@ -1447,7 +1447,7 @@ public class CodeGenerator extends BLangNodeVisitor {
             int typeDescCPIndex = currentPkgInfo.addCPEntry(typeDescCPEntry);
 
 
-            String constPkg = simpleVarRef.symbol.pkgID.getName().getValue();
+            String constPkg = simpleVarRef.symbol.pkgID.bvmAlias();
             UTF8CPEntry constPkgCPEntry = new UTF8CPEntry(constPkg);
             int constPkgCPIndex = currentPkgInfo.addCPEntry(constPkgCPEntry);
 
