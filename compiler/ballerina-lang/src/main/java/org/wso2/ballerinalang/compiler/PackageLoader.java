@@ -146,7 +146,7 @@ public class PackageLoader {
 
     public BLangPackage loadPackage(PackageID pkgId) {
         BLangPackage packageNode = loadPackage(pkgId, null);
-        addImportPkg(packageNode,Names.BUILTIN_ORG.value, Names.RUNTIME_PACKAGE.value);
+        addImportPkg(packageNode,Names.BUILTIN_ORG.value, Names.RUNTIME_PACKAGE.value, Names.DEFAULT_VERSION.value);
         return packageNode;
     }
 
@@ -163,9 +163,9 @@ public class PackageLoader {
         return packageNode;
     }
 
-    public BLangPackage loadAndDefinePackage(String sourcePkg) {
+    public BLangPackage loadAndDefinePackage(String orgName, String pkgName) {
         // TODO This is used only to load the builtin package.
-        PackageID pkgId = getPackageID(sourcePkg); //TODO: fix
+        PackageID pkgId = getPackageID(orgName, pkgName);
         return loadAndDefinePackage(pkgId);
     }
 
@@ -203,7 +203,7 @@ public class PackageLoader {
 
     // Private methods
 
-    private void addImportPkg(BLangPackage bLangPackage, String sourcePkgName) {
+    private void addImportPkg(BLangPackage bLangPackage, String orgName, String sourcePkgName, String version) {
         List<Name> nameComps = getPackageNameComps(sourcePkgName);
         List<BLangIdentifier> pkgNameComps = new ArrayList<>();
         nameComps.forEach(comp -> {
@@ -213,9 +213,9 @@ public class PackageLoader {
         });
 
         BLangIdentifier orgNameNode = (BLangIdentifier) TreeBuilder.createIdentifierNode();
-        orgNameNode.setValue(Names.BUILTIN_ORG.value);
+        orgNameNode.setValue(orgName);
         BLangIdentifier versionNode = (BLangIdentifier) TreeBuilder.createIdentifierNode();
-        versionNode.setValue(Names.DEFAULT_VERSION.value);
+        versionNode.setValue(version);
         BLangImportPackage importDcl = (BLangImportPackage) TreeBuilder.createImportPackageNode();
         importDcl.pos = bLangPackage.pos;
         importDcl.pkgNameComps = pkgNameComps;
@@ -232,6 +232,7 @@ public class PackageLoader {
         List<Name> pkgNameComps = getPackageNameComps(sourcePkg);
         Name orgName;
         if (org == null) {
+            System.out.println("Org-name is null");
             orgName = new Name(Names.ANON_ORG.getValue());
         } else {
             orgName = new Name(org);
