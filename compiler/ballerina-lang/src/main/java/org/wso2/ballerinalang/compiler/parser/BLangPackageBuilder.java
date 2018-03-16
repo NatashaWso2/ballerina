@@ -977,7 +977,7 @@ public class BLangPackageBuilder {
         importDcl.alias = aliasNode;
         this.compUnit.addTopLevelNode(importDcl);
         if (this.imports.contains(importDcl)) {
-            this.dlog.warning(pos, DiagnosticCode.REDECLARED_IMPORT_PACKAGE, importDcl.getQualifiedPackageName());
+            this.dlog.warning(pos, DiagnosticCode.REDECLARED_IMPORT_PACKAGE, importDcl.getOrgName() + "/" + importDcl.getQualifiedPackageName());
         } else {
             this.imports.add(importDcl);
         }

@@ -122,10 +122,10 @@ public class PackageID {
     public String toString() {
         System.out.println("* * * * * * ** * * * * *");
         if (version == Names.DEFAULT_VERSION || version == Names.EMPTY) {
-            return this.orgName +" / " + this.name.value;
+            return this.orgName +"/" + this.name.value;
         }
 
-        return this.orgName +" / " + this.name + "[" + this.version + "]";
+        return this.orgName +"/" + this.name + "[" + this.version + "]";
     }
 
     public Name getOrgName() {

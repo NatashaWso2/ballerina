@@ -87,10 +87,10 @@ import org.wso2.ballerinalang.compiler.util.diagnotic.DiagnosticPos;
 import org.wso2.ballerinalang.programfile.InstructionCodes;
 import org.wso2.ballerinalang.util.Lists;
 
+import javax.xml.XMLConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.xml.XMLConstants;
 
 /**
  * @since 0.94
@@ -866,8 +866,9 @@ public class TypeChecker extends BLangNodeVisitor {
             actualTypes = Lists.of(castSymbol.type.getReturnTypes().get(0));
 
         } else if (!castSymbol.safe && expected == 1) {
-            dlog.error(castExpr.pos, DiagnosticCode.UNSAFE_CAST_ATTEMPT, sourceType, targetType);
-
+            String srcType = getCastType(sourceType);
+            String trgtType = getCastType(targetType);
+            dlog.error(castExpr.pos, DiagnosticCode.UNSAFE_CAST_ATTEMPT, srcType, trgtType);
         } else if (expected == 2) {
             actualTypes = castSymbol.type.getReturnTypes();
 
@@ -878,6 +879,30 @@ public class TypeChecker extends BLangNodeVisitor {
         return actualTypes;
     }
 
+    private String getCastType(BType bType) {
+        String castType = "";
+        if (!((BStructSymbol) bType.tsymbol).pkgID.getOrgName().equals(Names.ANON_ORG)) {
+            // Check if org-name is empty
+            if (!((BStructSymbol) bType.tsymbol).pkgID.getOrgName().getValue().isEmpty()) {
+                castType = ((BStructSymbol) bType.tsymbol).pkgID.getOrgName().getValue() + "/";
+            }
+            // Check if the pkg path is empty
+            if (!((BStructSymbol) bType.tsymbol).pkgID.getName().getValue().isEmpty()) {
+                castType = castType + ((BStructSymbol) bType.tsymbol).pkgID.getName().getValue() + ":";
+            }
+        } else {
+            // Check if the pkg path is empty
+            if (!((BStructSymbol) bType.tsymbol).pkgID.getName().getValue().isEmpty() &&
+                    !((BStructSymbol) bType.tsymbol).pkgID.getName().getValue().equals(".")) {
+                castType = castType + ((BStructSymbol) bType.tsymbol).pkgID.getName().getValue() + ":";
+            }
+        }
+        // Check if the type name is empty
+        if (!bType.tsymbol.getName().getValue().isEmpty()) {
+            castType = castType + bType.tsymbol.getName();
+        }
+        return castType;
+    }
     private List<BType> getActualTypesOfConversionExpr(BLangTypeConversionExpr castExpr,
                                                        BType targetType,
                                                        BType sourceType,
@@ -1118,7 +1143,7 @@ public class TypeChecker extends BLangNodeVisitor {
         BSymbol fieldSymbol = symResolver.resolveStructField(keyExpr.pos, this.env,
                 fieldName, recordType.tsymbol);
         if (fieldSymbol == symTable.notFoundSymbol) {
-            dlog.error(keyExpr.pos, DiagnosticCode.UNDEFINED_STRUCT_FIELD, fieldName, recordType.tsymbol);
+            dlog.error(keyExpr.pos, DiagnosticCode.UNDEFINED_STRUCT_FIELD, fieldName, getCastType(recordType));
             return symTable.errType;
         }
 
@@ -1183,7 +1208,7 @@ public class TypeChecker extends BLangNodeVisitor {
         BSymbol fieldSymbol = symResolver.resolveStructField(varReferExpr.pos, this.env,
                 fieldName, structType.tsymbol);
         if (fieldSymbol == symTable.notFoundSymbol) {
-            dlog.error(varReferExpr.pos, DiagnosticCode.UNDEFINED_STRUCT_FIELD, fieldName, structType.tsymbol);
+            dlog.error(varReferExpr.pos, DiagnosticCode.UNDEFINED_STRUCT_FIELD, fieldName, getCastType(structType));
             return symTable.errType;
         }
 

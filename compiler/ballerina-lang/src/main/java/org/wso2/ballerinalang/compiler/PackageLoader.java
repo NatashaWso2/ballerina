@@ -231,7 +231,7 @@ public class PackageLoader {
         // split from '.', '\' and '/'
         List<Name> pkgNameComps = getPackageNameComps(sourcePkg);
         Name orgName;
-        if (org == null) {
+        if (org == null || org.isEmpty()) {
             System.out.println("Org-name is null");
             orgName = new Name(Names.ANON_ORG.getValue());
         } else {

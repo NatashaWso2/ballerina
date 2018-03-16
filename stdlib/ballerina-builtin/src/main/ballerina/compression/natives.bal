@@ -1,4 +1,4 @@
-package ballerina.compression;
+package compression;
 
 @Description {value:"Function to decompress compressed bytes"}
 @Param {value:"content: Byte array of the compressed file"}

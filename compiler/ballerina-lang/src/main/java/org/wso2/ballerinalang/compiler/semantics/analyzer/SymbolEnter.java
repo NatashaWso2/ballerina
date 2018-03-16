@@ -260,7 +260,7 @@ public class SymbolEnter extends BLangNodeVisitor {
         // TODO Clean this code up. Can we move the this to BLangPackageBuilder class
         // Create import package symbol
         Name orgName;
-        if (importPkgNode.orgName.value == null) {
+        if (importPkgNode.orgName.value == null || importPkgNode.orgName.value.isEmpty()) {
             // means it's in 'import <pkg-name>' style
             orgName = Names.ANON_ORG;
         } else {
@@ -281,7 +281,7 @@ public class SymbolEnter extends BLangNodeVisitor {
         PackageID pkgId = new PackageID(orgName, nameComps, names.fromIdNode(importPkgNode.version));
         if (pkgId.name.getValue().startsWith(Names.BUILTIN_PACKAGE.value)) {
             dlog.error(importPkgNode.pos, DiagnosticCode.PACKAGE_NOT_FOUND,
-                    importPkgNode.getQualifiedPackageName());
+                    importPkgNode.getOrgName() + "." + importPkgNode.getQualifiedPackageName());
             return;
         }
 
@@ -289,7 +289,7 @@ public class SymbolEnter extends BLangNodeVisitor {
         BLangPackage pkgNode = pkgLoader.loadPackage(pkgId, env.enclPkg.packageRepository);
         if (pkgNode == null) {
             dlog.error(importPkgNode.pos, DiagnosticCode.PACKAGE_NOT_FOUND,
-                    importPkgNode.getQualifiedPackageName());
+                    importPkgNode.getOrgName() + "." + importPkgNode.getQualifiedPackageName());
             return;
         }
 
@@ -888,6 +888,9 @@ public class SymbolEnter extends BLangNodeVisitor {
     }
 
     private void createPackageInitFunction(BLangPackage pkgNode) {
+        if (pkgNode.symbol.pkgID.getOrgName().getValue().isEmpty()) {
+            System.out.println("Init org name is empty");
+        }
         BLangFunction initFunction = createInitFunction(pkgNode.pos, pkgNode.symbol.pkgID.bvmAlias());
         pkgNode.initFunction = initFunction;
     }

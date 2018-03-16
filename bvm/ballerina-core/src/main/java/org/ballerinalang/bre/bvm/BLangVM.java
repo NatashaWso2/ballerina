@@ -2598,7 +2598,19 @@ public class BLangVM {
     }
 
     private void handleTypeCastError(StackFrame sf, int errorRegIndex, BType sourceType, BType targetType) {
-        handleTypeCastError(sf, errorRegIndex, sourceType.toString(), targetType.toString());
+        String srcType = getNameWithPkgPath(sourceType.getPackagePath(), sourceType.getName());
+        String trgtType = getNameWithPkgPath(targetType.getPackagePath(), targetType.getName());
+        handleTypeCastError(sf, errorRegIndex, srcType, trgtType);
+    }
+
+    private String getNameWithPkgPath(String pkgPath, String name){
+        if (!pkgPath.equals("$anon..")) {
+            if (pkgPath.startsWith("$anon")) {  // TODO Check if pkgPath starts with $anon
+                pkgPath = pkgPath.replace("$anon.", "");
+            }
+            name = pkgPath + "/" + name;
+        }
+        return name;
     }
 
     private void handleTypeCastError(StackFrame sf, int errorRegIndex, String sourceType, String targetType) {
@@ -3926,8 +3938,13 @@ public class BLangVM {
             sf.refRegs[k] = null;
         } catch (Exception e) {
             sf.refRegs[j] = null;
+            String type = typeRefCPEntry.getType().getName();
+            String pkgPath = typeRefCPEntry.getType().getPackagePath();
+            if (!pkgPath.equals("$anon..")) {
+                type = pkgPath + "/" + type;
+            }
             String errorMsg = "cannot convert '" + TypeConstants.JSON_TNAME + "' to type '" +
-                    typeRefCPEntry.getType() + "': " + e.getMessage();
+                    type + "': " + e.getMessage();
             handleTypeConversionError(sf, k, errorMsg);
         }
     }

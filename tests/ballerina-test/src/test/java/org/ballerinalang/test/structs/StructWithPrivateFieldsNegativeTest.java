@@ -52,6 +52,6 @@ public class StructWithPrivateFieldsNegativeTest {
                 "test-src/structs/struct-private-fields-01-negative.bal");
         BValue[] returns = BRunUtil.invoke(compileResult, "testRuntimeStructEqNegative");
 
-        Assert.assertEquals(returns[0].stringValue(), "'org.foo:user' cannot be cast to 'userB'");
+        Assert.assertEquals(returns[0].stringValue(), "'org.foo/user' cannot be cast to 'userB'");
     }
 }
