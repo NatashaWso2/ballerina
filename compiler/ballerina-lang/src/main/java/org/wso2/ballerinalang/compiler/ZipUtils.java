@@ -40,6 +40,7 @@ import java.util.stream.Stream;
  */
 class ZipUtils {
     private static final String SRC_DIR = "src";
+
     /**
      * Generates the balo/zip of the package.
      *
@@ -111,11 +112,13 @@ class ZipUtils {
      */
     private static void copyFileToArchive(InputStream srcInputStream, Path destPath) throws IOException {
         Path parent = destPath.getParent();
-        if (parent != null) {
-            if (Files.notExists(parent)) {
-                Files.createDirectories(parent);
-            }
-            Files.copy(srcInputStream, destPath, StandardCopyOption.REPLACE_EXISTING);
+        if (parent == null) {
+            return;
         }
+        if (Files.notExists(parent)) {
+            Files.createDirectories(parent);
+        }
+        Files.copy(srcInputStream, destPath, StandardCopyOption.REPLACE_EXISTING);
+
     }
 }
