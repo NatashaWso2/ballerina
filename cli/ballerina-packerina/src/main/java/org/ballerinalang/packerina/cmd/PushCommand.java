@@ -22,17 +22,10 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import org.ballerinalang.launcher.BLauncherCmd;
 import org.ballerinalang.launcher.LauncherUtils;
-import org.ballerinalang.model.elements.PackageID;
-import org.wso2.ballerinalang.compiler.packaging.Patten;
-import org.wso2.ballerinalang.compiler.packaging.converters.Converter;
-import org.wso2.ballerinalang.compiler.packaging.repo.RemoteRepo;
-import org.wso2.ballerinalang.compiler.packaging.repo.Repo;
-import org.wso2.ballerinalang.compiler.util.Name;
+import org.ballerinalang.packerina.PushUtils;
 
 import java.io.PrintStream;
-import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.ballerinalang.runtime.Constants.SYSTEM_PROP_BAL_DEBUG;
 
@@ -84,24 +77,7 @@ public class PushCommand implements BLauncherCmd {
         }
 
         String packageName = argList.get(0);
-
-        URI baseURI = URI.create("https://staging.central.ballerina.io:9090/");
-        Repo remoteRepo = new RemoteRepo(baseURI);
-
-        // Get the org-name and version from the toml file
-        String orgName = "";
-        String version = "";
-
-        PackageID packageID = new PackageID(new Name(orgName), new Name(packageName), new Name(version));
-
-        Patten patten = remoteRepo.calculate(packageID);
-        if (patten != Patten.NULL) {
-            Converter converter = remoteRepo.getConverterInstance();
-            patten.convert(converter).collect(Collectors.toList());
-
-        } else {
-            outStream.println("couldn't find package " + patten);
-        }
+        PushUtils.pushPackages(packageName, repositoryHome);
         Runtime.getRuntime().exit(0);
     }
 
