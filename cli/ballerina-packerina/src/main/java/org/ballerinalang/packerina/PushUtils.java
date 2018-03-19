@@ -18,10 +18,16 @@
 package org.ballerinalang.packerina;
 
 import org.ballerinalang.compiler.BLangCompilerException;
+import org.ballerinalang.model.elements.PackageID;
 import org.ballerinalang.packerina.toml.model.Manifest;
 import org.ballerinalang.packerina.toml.model.Settings;
 import org.ballerinalang.packerina.toml.parser.ManifestProcessor;
 import org.ballerinalang.packerina.toml.parser.SettingsProcessor;
+import org.wso2.ballerinalang.compiler.packaging.Patten;
+import org.wso2.ballerinalang.compiler.packaging.converters.Converter;
+import org.wso2.ballerinalang.compiler.packaging.repo.Repo;
+import org.wso2.ballerinalang.compiler.packaging.repo.ZipRepo;
+import org.wso2.ballerinalang.compiler.util.Name;
 import org.wso2.ballerinalang.util.ExecutorUtils;
 import org.wso2.ballerinalang.util.HomeRepoUtils;
 
@@ -32,6 +38,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class provides util methods when pushing Ballerina packages to central and home repository.
@@ -63,33 +71,32 @@ public class PushUtils {
         String orgName = removeQuotationsFromValue(manifest.getName());
         String version = removeQuotationsFromValue(manifest.getVersion());
 
+        PackageID packageID = new PackageID(new Name(orgName), new Name(packageName), new Name(version));
         Path prjDirPath = Paths.get(".").toAbsolutePath().normalize().resolve(".ballerina");
-        Path pkgPath = Paths.get(prjDirPath.toString(), "repo", orgName, packageName, version);
 
-        if (Files.notExists(pkgPath)) {
-            throw new BLangCompilerException("Package " + packageName + " of version " + version + " doesn't " +
-                    "exist");
-        }
+        // Get package path from project directory path
+        Path pkgPathFromPrjtDir = getProjectPkgPath(prjDirPath, packageID);
+
         if (installToRepo == null) {
             // Push package to central
-            String archiveExt = pkgPath.resolve(packageName + ".zip").toString();
             String resourcePath = "https://staging.central.ballerina.io:9090/" + Paths.get(orgName,
                     packageName, version);
             URI balxPath = URI.create(String.valueOf(PushUtils.class.getClassLoader().getResource
                     ("ballerina.push.balx")));
-            ExecutorUtils.execute(balxPath, accessToken, resourcePath, archiveExt);
+            ExecutorUtils.execute(balxPath, accessToken, resourcePath, pkgPathFromPrjtDir.toString());
         } else {
             if (!installToRepo.equals("home")) {
                 throw new BLangCompilerException("No repository provided to push the package");
             }
             Path balHomeDir = HomeRepoUtils.createAndGetHomeReposPath();
-            Path targetDirectoryPath = balHomeDir.resolve(orgName).resolve(packageName).resolve(version);
+            Path targetDirectoryPath = Paths.get(balHomeDir.toString(), "repo", orgName, packageName, version);
             if (Files.exists(targetDirectoryPath)) {
                 outStream.println("Ballerina package already in the user repository");
             } else {
                 try {
                     Files.createDirectories(targetDirectoryPath);
-                    copyDir(pkgPath.toString(), targetDirectoryPath.toString());
+                    Files.copy(pkgPathFromPrjtDir, targetDirectoryPath.resolve(packageName + ".zip"),
+                            StandardCopyOption.REPLACE_EXISTING);
                     outStream.println("Ballerina package pushed to the user repository successfully");
                 } catch (IOException e) {
                     throw new BLangCompilerException("Error when occured when creating directories in " +
@@ -97,7 +104,27 @@ public class PushUtils {
                 }
             }
         }
+    }
 
+    /**
+     * Get the path of the project repo.
+     * @param prjDirPath project directory path
+     * @param packageID packageID object
+     * @return full path of the package relative to the project dir
+     */
+    private static Path getProjectPkgPath(Path prjDirPath, PackageID packageID) {
+        Repo projectRepo = new ZipRepo(prjDirPath);
+        Patten patten = projectRepo.calculate(packageID);
+        if (patten == Patten.NULL) {
+            throw new BLangCompilerException("Couldn't find package " + packageID.toString());
+        }
+        Converter converter = projectRepo.getConverterInstance();
+        List<Path> paths = patten.convertToPaths(converter, packageID).collect(Collectors.toList());
+        if (paths.isEmpty()) {
+            throw new BLangCompilerException("Couldn't find package " + packageID.toString());
+        }
+        return Paths.get(patten.convertToPaths(converter, packageID).collect(Collectors.toList()).get(0)
+                .getFileSystem().toString());
     }
 
     /**
@@ -149,24 +176,5 @@ public class PushUtils {
      */
     private static String removeQuotationsFromValue(String value) {
         return value.replace("\"", "");
-    }
-
-    /**
-     * Copy folders/files from source directory to the destination directory.
-     *
-     * @param src  source directory path
-     * @param dest destination directory path
-     */
-    private static void copyDir(String src, String dest) throws IOException {
-        Files.walk(Paths.get(src)).forEach(a -> {
-            Path b = Paths.get(dest, a.toString().substring(src.length()));
-            if (!a.toString().equals(src)) {
-                try {
-                    Files.copy(a, b, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    throw new BLangCompilerException("Error occurred when pushing package to the user repository");
-                }
-            }
-        });
     }
 }
