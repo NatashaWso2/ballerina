@@ -41,23 +41,6 @@ public class Manifest {
     private List<Dependency> patches = new ArrayList<>();
 
     /**
-     * Constructor of manifest object with org-name and version.
-     *
-     * @param name    org-name
-     * @param version version of the package
-     */
-    public Manifest(String name, String version) {
-        this.name = name;
-        this.version = version;
-    }
-
-    /**
-     * Default constructor.
-     */
-    public Manifest() {
-    }
-
-    /**
      * Get the patches list.
      *
      * @return patches list

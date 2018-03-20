@@ -20,8 +20,8 @@ package org.ballerinalang.packerina.cmd;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import org.ballerinalang.compiler.BLangCompilerException;
 import org.ballerinalang.launcher.BLauncherCmd;
-import org.ballerinalang.launcher.LauncherUtils;
 import org.ballerinalang.packerina.PushUtils;
 
 import java.io.PrintStream;
@@ -64,11 +64,11 @@ public class PushCommand implements BLauncherCmd {
         }
 
         if (argList == null || argList.size() == 0) {
-            throw LauncherUtils.createUsageException("no package given");
+            throw new BLangCompilerException("No package given");
         }
 
         if (argList.size() > 1) {
-            throw LauncherUtils.createUsageException("too many arguments");
+            throw new BLangCompilerException("too many arguments");
         }
 
         // Enable remote debugging

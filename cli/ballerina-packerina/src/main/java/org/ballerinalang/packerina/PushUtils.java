@@ -57,7 +57,7 @@ public class PushUtils {
      * @param installToRepo if it should be pushed to central or home
      */
     public static void pushPackages(String packageName, String installToRepo) {
-        String accessToken = getAccessTokenOfCLI() != null ? removeQuotationsFromValue(getAccessTokenOfCLI()) : null;
+        String accessToken = getAccessTokenOfCLI() != null ? getAccessTokenOfCLI() : null;
         if (accessToken == null) {
             throw new BLangCompilerException("You have not specified an access-token for the central in your" +
                     " Settings.toml\n. Please login to central if you are already registered using" +
@@ -69,8 +69,8 @@ public class PushUtils {
             throw new BLangCompilerException("An org-name and package version is required when pushing. " +
                     "This is not specified in Ballerina.toml inside the project");
         }
-        String orgName = removeQuotationsFromValue(manifest.getName());
-        String version = removeQuotationsFromValue(manifest.getVersion());
+        String orgName = manifest.getName();
+        String version = manifest.getVersion();
 
         PackageID packageID = new PackageID(new Name(orgName), new Name(packageName), new Name(version));
         Path prjDirPath = Paths.get(".").toAbsolutePath().normalize().resolve(".ballerina");
@@ -83,6 +83,7 @@ public class PushUtils {
             URI balxPath = URI.create(String.valueOf(PushUtils.class.getClassLoader().getResource
                     ("ballerina.push.balx")));
             ExecutorUtils.execute(balxPath, accessToken, resourcePath, pkgPathFromPrjtDir.toString());
+            outStream.println(orgName + "/" + packageName + ":" + version + "[project repo -> central]");
         } else {
             if (!installToRepo.equals("home")) {
                 throw new BLangCompilerException("No repository provided to push the package");
@@ -91,15 +92,14 @@ public class PushUtils {
             Path targetDirectoryPath = Paths.get(balHomeDir.toString(), "repo", orgName, packageName, version,
                     packageName + ".zip");
             if (Files.exists(targetDirectoryPath)) {
-                outStream.println("Ballerina package already exists in the user repository");
+                throw new BLangCompilerException("Ballerina package exists in the home repository");
             } else {
                 try {
                     Files.createDirectories(targetDirectoryPath);
                     Files.copy(pkgPathFromPrjtDir, targetDirectoryPath, StandardCopyOption.REPLACE_EXISTING);
-                    outStream.println("Ballerina package pushed to the user repository successfully");
+                    outStream.println(orgName + "/" + packageName + ":" + version + "[project repo -> home repo]");
                 } catch (IOException e) {
-                    throw new BLangCompilerException("Error when occured when creating directories in " +
-                            "./ballerina/artifacts/ to install the package locally");
+                    throw new BLangCompilerException("Error occured when creating directories in the home repository");
                 }
             }
         }
@@ -167,7 +167,7 @@ public class PushUtils {
      * @return settings object
      */
     private static Settings readSettings() {
-        String tomlFilePath = UserRepositoryUtils.initializeUserRepository().resolve("Settings.toml").toString();
+        String tomlFilePath = HomeRepoUtils.createAndGetHomeReposPath().resolve("Settings.toml").toString();
         try {
             return SettingsProcessor.parseTomlContentFromFile(tomlFilePath);
         } catch (IOException e) {
@@ -186,15 +186,5 @@ public class PushUtils {
             return settings.getCentral().getAccessToken();
         }
         return null;
-    }
-
-    /**
-     * Remove enclosing quotation from the string value.
-     *
-     * @param value string value with enclosing quotations
-     * @return string value after removing the enclosing quotations
-     */
-    private static String removeQuotationsFromValue(String value) {
-        return value.replace("\"", "");
     }
 }

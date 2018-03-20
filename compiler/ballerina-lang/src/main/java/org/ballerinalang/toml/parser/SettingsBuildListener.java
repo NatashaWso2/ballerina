@@ -26,6 +26,7 @@ import org.ballerinalang.toml.model.fields.CentralField;
 import org.ballerinalang.toml.model.fields.ProxyField;
 import org.ballerinalang.toml.model.fields.SettingHeaders;
 import org.ballerinalang.toml.util.SingletonStack;
+import org.ballerinalang.toml.util.TomlUtils;
 
 /**
  * Custom listener which is extended from the Toml listener with our own custom logic.
@@ -37,6 +38,7 @@ public class SettingsBuildListener extends TomlBaseListener {
     private final Proxy proxy = new Proxy();
     private final Central central = new Central();
     private final SingletonStack<String> currentKey = new SingletonStack<>();
+    private final TomlUtils tomlUtils = new TomlUtils();
     private String currentHeader = null;
 
     /**
@@ -69,7 +71,7 @@ public class SettingsBuildListener extends TomlBaseListener {
      */
     @Override
     public void enterString(TomlParser.StringContext ctx) {
-        setToManifest(ctx.getText());
+        setToManifest(tomlUtils.removeQuotationsFromValue(ctx.getText()));
     }
 
     /**

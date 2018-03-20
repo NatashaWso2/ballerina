@@ -31,8 +31,6 @@ function pushPackage (string accessToken, string url, string dirPath) {
         } else {
             io:println(jsonResponse.msg.toString());
         }
-    } else {
-        io:println("Ballerina package pushed successfully");
     }
 }
 

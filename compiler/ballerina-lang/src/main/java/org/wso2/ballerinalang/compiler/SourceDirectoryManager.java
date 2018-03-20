@@ -71,16 +71,17 @@ public class SourceDirectoryManager {
     }
 
     private Manifest getManifestObj() {
-        Manifest manifest = new Manifest(Names.ANON_ORG.getValue(), Names.DEFAULT_VERSION.getValue());
+        Manifest manifest;
         if (sourceDirectory.getManifestContent() == null) {
-            return manifest;
+            manifest = new Manifest();
+        } else {
+            manifest = ManifestProcessor.parseTomlContentAsStream(sourceDirectory.getManifestContent());
         }
-        Manifest manifestObj = ManifestProcessor.parseTomlContentAsStream(sourceDirectory.getManifestContent());
-        if (manifestObj.getName() != null) {
-            manifest.setName(removeQuotesFromValue(manifestObj.getName()));
+        if (manifest.getName() == null) {
+            manifest.setName(Names.ANON_ORG.getValue());
         }
-        if (manifestObj.getVersion() != null) {
-            manifest.setVersion(removeQuotesFromValue(manifestObj.getVersion()));
+        if (manifest.getVersion() == null) {
+            manifest.setVersion(Names.DEFAULT_VERSION.getValue());
         }
         return manifest;
     }

@@ -25,6 +25,7 @@ import org.ballerinalang.toml.model.fields.DependencyField;
 import org.ballerinalang.toml.model.fields.ManifestHeader;
 import org.ballerinalang.toml.model.fields.PackageField;
 import org.ballerinalang.toml.util.SingletonStack;
+import org.ballerinalang.toml.util.TomlUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +38,7 @@ import java.util.List;
 public class ManifestBuildListener extends TomlBaseListener {
     private final Manifest manifest;
     private final SingletonStack<String> currentKey = new SingletonStack<>();
+    private final TomlUtils tomlUtils = new TomlUtils();
     private Dependency dependency;
     private String currentHeader = null;
 
@@ -70,7 +72,7 @@ public class ManifestBuildListener extends TomlBaseListener {
      */
     @Override
     public void enterString(TomlParser.StringContext ctx) {
-        setToManifest(ctx.getText());
+        setToManifest(tomlUtils.removeQuotationsFromValue(ctx.getText()));
     }
 
     /**
@@ -192,7 +194,7 @@ public class ManifestBuildListener extends TomlBaseListener {
         List<String> arrayElements = new ArrayList<>();
         if (arrayValuesContext != null) {
             for (TomlParser.ArrayvalsNonEmptyContext valueContext : arrayValuesContext.arrayvalsNonEmpty()) {
-                arrayElements.add(valueContext.getText());
+                arrayElements.add(tomlUtils.removeQuotationsFromValue(valueContext.getText()));
             }
         }
         return arrayElements;
@@ -238,7 +240,8 @@ public class ManifestBuildListener extends TomlBaseListener {
             String name = valueContext.key().getText();
             DependencyField dependencyField = DependencyField.valueOfLowerCase(name);
             if (dependencyField != null) {
-                dependencyField.setValueTo(dependency, valueContext.val().getText());
+                dependencyField.setValueTo(dependency,
+                        tomlUtils.removeQuotationsFromValue(valueContext.val().getText()));
             }
         }
     }
