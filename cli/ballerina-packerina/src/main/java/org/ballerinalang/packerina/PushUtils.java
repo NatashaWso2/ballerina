@@ -91,7 +91,7 @@ public class PushUtils {
             Path targetDirectoryPath = Paths.get(balHomeDir.toString(), "repo", orgName, packageName, version,
                     packageName + ".zip");
             if (Files.exists(targetDirectoryPath)) {
-                outStream.println("Ballerina package already in the user repository");
+                outStream.println("Ballerina package already exists in the user repository");
             } else {
                 try {
                     Files.createDirectories(targetDirectoryPath);
