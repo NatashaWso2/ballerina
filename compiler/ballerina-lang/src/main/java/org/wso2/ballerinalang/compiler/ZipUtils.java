@@ -77,7 +77,7 @@ class ZipUtils {
         Map<String, String> zipFSEnv = new HashMap<>();
         zipFSEnv.put("create", "true");
         URI filepath = Paths.get(outFileName).toUri();
-        URI zipFileURI = null;
+        URI zipFileURI;
         try {
             zipFileURI = new URI("jar:" + filepath.getScheme(),
                     filepath.getUserInfo(), filepath.getHost(), filepath.getPort(),
