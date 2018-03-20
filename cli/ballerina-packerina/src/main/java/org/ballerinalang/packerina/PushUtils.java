@@ -25,6 +25,7 @@ import org.ballerinalang.packerina.toml.parser.ManifestProcessor;
 import org.ballerinalang.packerina.toml.parser.SettingsProcessor;
 import org.wso2.ballerinalang.compiler.packaging.Patten;
 import org.wso2.ballerinalang.compiler.packaging.converters.Converter;
+import org.wso2.ballerinalang.compiler.packaging.repo.RemoteRepo;
 import org.wso2.ballerinalang.compiler.packaging.repo.Repo;
 import org.wso2.ballerinalang.compiler.packaging.repo.ZipRepo;
 import org.wso2.ballerinalang.compiler.util.Name;
@@ -75,12 +76,10 @@ public class PushUtils {
         Path prjDirPath = Paths.get(".").toAbsolutePath().normalize().resolve(".ballerina");
 
         // Get package path from project directory path
-        Path pkgPathFromPrjtDir = getProjectPkgPath(prjDirPath, packageID);
-
+        Path pkgPathFromPrjtDir = resolvePkgPathInProjectRepo(prjDirPath, packageID);
         if (installToRepo == null) {
             // Push package to central
-            String resourcePath = "https://staging.central.ballerina.io:9090/" + Paths.get(orgName,
-                    packageName, version);
+            String resourcePath = resolvePkgPathInRemoteRepo(packageID);
             URI balxPath = URI.create(String.valueOf(PushUtils.class.getClassLoader().getResource
                     ("ballerina.push.balx")));
             ExecutorUtils.execute(balxPath, accessToken, resourcePath, pkgPathFromPrjtDir.toString());
@@ -89,14 +88,14 @@ public class PushUtils {
                 throw new BLangCompilerException("No repository provided to push the package");
             }
             Path balHomeDir = HomeRepoUtils.createAndGetHomeReposPath();
-            Path targetDirectoryPath = Paths.get(balHomeDir.toString(), "repo", orgName, packageName, version);
+            Path targetDirectoryPath = Paths.get(balHomeDir.toString(), "repo", orgName, packageName, version,
+                    packageName + ".zip");
             if (Files.exists(targetDirectoryPath)) {
                 outStream.println("Ballerina package already in the user repository");
             } else {
                 try {
                     Files.createDirectories(targetDirectoryPath);
-                    Files.copy(pkgPathFromPrjtDir, targetDirectoryPath.resolve(packageName + ".zip"),
-                            StandardCopyOption.REPLACE_EXISTING);
+                    Files.copy(pkgPathFromPrjtDir, targetDirectoryPath, StandardCopyOption.REPLACE_EXISTING);
                     outStream.println("Ballerina package pushed to the user repository successfully");
                 } catch (IOException e) {
                     throw new BLangCompilerException("Error when occured when creating directories in " +
@@ -108,12 +107,13 @@ public class PushUtils {
 
     /**
      * Get the path of the project repo.
+     *
      * @param prjDirPath project directory path
-     * @param packageID packageID object
+     * @param packageID  packageID object
      * @return full path of the package relative to the project dir
      */
-    private static Path getProjectPkgPath(Path prjDirPath, PackageID packageID) {
-        Repo projectRepo = new ZipRepo(prjDirPath);
+    private static Path resolvePkgPathInProjectRepo(Path prjDirPath, PackageID packageID) {
+        Repo<Path> projectRepo = new ZipRepo(prjDirPath);
         Patten patten = projectRepo.calculate(packageID);
         if (patten == Patten.NULL) {
             throw new BLangCompilerException("Couldn't find package " + packageID.toString());
@@ -125,6 +125,26 @@ public class PushUtils {
         }
         return Paths.get(patten.convertToPaths(converter, packageID).collect(Collectors.toList()).get(0)
                 .getFileSystem().toString());
+    }
+
+    /**
+     * Get URI of the package from the remote repo.
+     *
+     * @param packageID packageID object
+     * @return full URI path of the package relative to the remote repo
+     */
+    private static String resolvePkgPathInRemoteRepo(PackageID packageID) {
+        Repo<URI> remoteRepo = new RemoteRepo(URI.create("https://staging.central.ballerina.io:9090/"));
+        Patten patten = remoteRepo.calculate(packageID);
+        if (patten == Patten.NULL) {
+            throw new BLangCompilerException("Couldn't find package " + packageID.toString());
+        }
+        Converter<URI> converter = remoteRepo.getConverterInstance();
+        List<URI> uris = patten.convert(converter).collect(Collectors.toList());
+        if (uris.isEmpty()) {
+            throw new BLangCompilerException("Couldn't find package " + packageID.toString());
+        }
+        return uris.get(0).toString();
     }
 
     /**
