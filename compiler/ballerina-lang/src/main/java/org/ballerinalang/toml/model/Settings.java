@@ -15,7 +15,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model;
+package org.ballerinalang.toml.model;
 
 /**
  * Defines the settings object which is created using the toml file configs.

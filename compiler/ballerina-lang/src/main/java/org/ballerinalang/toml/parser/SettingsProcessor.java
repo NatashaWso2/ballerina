@@ -15,14 +15,14 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.parser;
+package org.ballerinalang.toml.parser;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.ballerinalang.packerina.toml.model.Settings;
-import org.ballerinalang.packerina.toml.util.TomlProcessor;
+import org.ballerinalang.toml.model.Settings;
+import org.ballerinalang.toml.util.TomlProcessor;
 
 import java.io.IOException;
 

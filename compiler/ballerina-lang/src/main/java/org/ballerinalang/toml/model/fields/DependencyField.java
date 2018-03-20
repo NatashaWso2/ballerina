@@ -15,9 +15,9 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model.fields;
+package org.ballerinalang.toml.model.fields;
 
-import org.ballerinalang.packerina.toml.model.Central;
+import org.ballerinalang.toml.model.Dependency;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -25,30 +25,31 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
- * Central object fields.
+ * Dependency object fields.
  *
  * @since 0.964
  */
-public enum CentralField {
-    ACCESSTOKEN(Central::setAccessToken);
+public enum DependencyField {
+    NAME(Dependency::setPackageName),
+    VERSION(Dependency::setVersion),
+    LOCATION(Dependency::setLocation);
 
-    private static final Map<String, CentralField> LOOKUP = new HashMap<>();
+    private static final Map<String, DependencyField> LOOKUP = new HashMap<>();
 
     static {
-        for (CentralField centralField : CentralField.values()) {
-
-            LOOKUP.put(centralField.name().toLowerCase(Locale.ENGLISH), centralField);
+        for (DependencyField dependencyField : DependencyField.values()) {
+            LOOKUP.put(dependencyField.name().toLowerCase(Locale.ENGLISH), dependencyField);
         }
     }
 
-    private final BiConsumer<Central, String> stringSetter;
+    private final BiConsumer<Dependency, String> stringSetter;
 
     /**
      * Constructor which sets the string value.
      *
      * @param stringSetter string value to be set
      */
-    CentralField(BiConsumer<Central, String> stringSetter) {
+    DependencyField(BiConsumer<Dependency, String> stringSetter) {
         this.stringSetter = stringSetter;
     }
 
@@ -58,17 +59,17 @@ public enum CentralField {
      * @param fieldKey Lower case string value of filed to find.
      * @return Matching enum.
      */
-    public static CentralField valueOfLowerCase(String fieldKey) {
+    public static DependencyField valueOfLowerCase(String fieldKey) {
         return LOOKUP.get(fieldKey);
     }
 
     /**
-     * Set values to the central object.
+     * Set values to the dependency object.
      *
-     * @param central object
-     * @param value   value to be set
+     * @param dependency dependency object
+     * @param value      value to be set
      */
-    public void setValueTo(Central central, String value) {
-        stringSetter.accept(central, value);
+    public void setValueTo(Dependency dependency, String value) {
+        stringSetter.accept(dependency, value);
     }
 }

@@ -19,10 +19,10 @@ package org.ballerinalang.packerina;
 
 import org.ballerinalang.compiler.BLangCompilerException;
 import org.ballerinalang.model.elements.PackageID;
-import org.ballerinalang.packerina.toml.model.Manifest;
-import org.ballerinalang.packerina.toml.model.Settings;
-import org.ballerinalang.packerina.toml.parser.ManifestProcessor;
-import org.ballerinalang.packerina.toml.parser.SettingsProcessor;
+import org.ballerinalang.toml.model.Manifest;
+import org.ballerinalang.toml.model.Settings;
+import org.ballerinalang.toml.parser.ManifestProcessor;
+import org.ballerinalang.toml.parser.SettingsProcessor;
 import org.wso2.ballerinalang.compiler.packaging.Patten;
 import org.wso2.ballerinalang.compiler.packaging.converters.Converter;
 import org.wso2.ballerinalang.compiler.packaging.repo.RemoteRepo;

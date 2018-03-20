@@ -15,7 +15,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model;
+package org.ballerinalang.toml.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,23 @@ public class Manifest {
     private String license;
     private List<Dependency> dependencies = new ArrayList<>();
     private List<Dependency> patches = new ArrayList<>();
+
+    /**
+     * Constructor of manifest object with org-name and version.
+     *
+     * @param name    org-name
+     * @param version version of the package
+     */
+    public Manifest(String name, String version) {
+        this.name = name;
+        this.version = version;
+    }
+
+    /**
+     * Default constructor.
+     */
+    public Manifest() {
+    }
 
     /**
      * Get the patches list.
@@ -232,7 +249,7 @@ public class Manifest {
     }
 
     /**
-     * Set the version
+     * Set the version.
      *
      * @param version version of the package.
      */

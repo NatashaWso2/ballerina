@@ -15,9 +15,9 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model.fields;
+package org.ballerinalang.toml.model.fields;
 
-import org.ballerinalang.packerina.toml.model.Dependency;
+import org.ballerinalang.toml.model.Proxy;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -25,31 +25,34 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
- * Dependency object fields.
+ * Proxy object fields.
  *
  * @since 0.964
  */
-public enum DependencyField {
-    NAME(Dependency::setPackageName),
-    VERSION(Dependency::setVersion),
-    LOCATION(Dependency::setLocation);
+public enum ProxyField {
+    HOST(Proxy::setHost),
+    PORT(Proxy::setPort),
+    USERNAME(Proxy::setUserName),
+    PASSWORD(Proxy::setPassword);
 
-    private static final Map<String, DependencyField> LOOKUP = new HashMap<>();
+    private static final Map<String, ProxyField> LOOKUP;
 
     static {
-        for (DependencyField dependencyField : DependencyField.values()) {
-            LOOKUP.put(dependencyField.name().toLowerCase(Locale.ENGLISH), dependencyField);
+        Map<String, ProxyField> lookUpMap = new HashMap<>();
+        for (ProxyField proxyField : ProxyField.values()) {
+            lookUpMap.put(proxyField.name().toLowerCase(Locale.ENGLISH), proxyField);
         }
+        LOOKUP = lookUpMap;
     }
 
-    private final BiConsumer<Dependency, String> stringSetter;
+    private final BiConsumer<Proxy, String> stringSetter;
 
     /**
      * Constructor which sets the string value.
      *
      * @param stringSetter string value to be set
      */
-    DependencyField(BiConsumer<Dependency, String> stringSetter) {
+    ProxyField(BiConsumer<Proxy, String> stringSetter) {
         this.stringSetter = stringSetter;
     }
 
@@ -59,17 +62,17 @@ public enum DependencyField {
      * @param fieldKey Lower case string value of filed to find.
      * @return Matching enum.
      */
-    public static DependencyField valueOfLowerCase(String fieldKey) {
+    public static ProxyField valueOfLowerCase(String fieldKey) {
         return LOOKUP.get(fieldKey);
     }
 
     /**
-     * Set values to the dependency object.
+     * Set values to the proxy object.
      *
-     * @param dependency dependency object
-     * @param value      value to be set
+     * @param proxy proxy object
+     * @param value value to be set
      */
-    public void setValueTo(Dependency dependency, String value) {
-        stringSetter.accept(dependency, value);
+    public void setValueTo(Proxy proxy, String value) {
+        stringSetter.accept(proxy, value);
     }
 }

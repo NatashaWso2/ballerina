@@ -15,7 +15,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model.fields;
+package org.ballerinalang.toml.model.fields;
 
 import java.util.Locale;
 

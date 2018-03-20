@@ -15,16 +15,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model.fields;
+package org.ballerinalang.toml.model.fields;
 
 import java.util.Locale;
 
 /**
- * Section defined in the toml file.
+ * Section headers valid in the manifest toml file.
  *
  * @since 0.964
  */
-public enum Section {
+public enum ManifestHeader {
     PACKAGE, DEPENDENCIES, PATCHES, PROXY;
 
     /**

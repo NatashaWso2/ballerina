@@ -15,10 +15,9 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model.fields;
+package org.ballerinalang.toml.model.fields;
 
-
-import org.ballerinalang.packerina.toml.model.Proxy;
+import org.ballerinalang.toml.model.Central;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -26,34 +25,30 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
- * Proxy object fields.
+ * Central object fields.
  *
  * @since 0.964
  */
-public enum ProxyField {
-    HOST(Proxy::setHost),
-    PORT(Proxy::setPort),
-    USERNAME(Proxy::setUserName),
-    PASSWORD(Proxy::setPassword);
+public enum CentralField {
+    ACCESSTOKEN(Central::setAccessToken);
 
-    private static final Map<String, ProxyField> LOOKUP;
+    private static final Map<String, CentralField> LOOKUP = new HashMap<>();
 
     static {
-        Map<String, ProxyField> lookUpMap = new HashMap<>();
-        for (ProxyField proxyField : ProxyField.values()) {
-            lookUpMap.put(proxyField.name().toLowerCase(Locale.ENGLISH), proxyField);
+        for (CentralField centralField : CentralField.values()) {
+
+            LOOKUP.put(centralField.name().toLowerCase(Locale.ENGLISH), centralField);
         }
-        LOOKUP = lookUpMap;
     }
 
-    private final BiConsumer<Proxy, String> stringSetter;
+    private final BiConsumer<Central, String> stringSetter;
 
     /**
      * Constructor which sets the string value.
      *
      * @param stringSetter string value to be set
      */
-    ProxyField(BiConsumer<Proxy, String> stringSetter) {
+    CentralField(BiConsumer<Central, String> stringSetter) {
         this.stringSetter = stringSetter;
     }
 
@@ -63,17 +58,17 @@ public enum ProxyField {
      * @param fieldKey Lower case string value of filed to find.
      * @return Matching enum.
      */
-    public static ProxyField valueOfLowerCase(String fieldKey) {
+    public static CentralField valueOfLowerCase(String fieldKey) {
         return LOOKUP.get(fieldKey);
     }
 
     /**
-     * Set values to the proxy object.
+     * Set values to the central object.
      *
-     * @param proxy proxy object
-     * @param value value to be set
+     * @param central object
+     * @param value   value to be set
      */
-    public void setValueTo(Proxy proxy, String value) {
-        stringSetter.accept(proxy, value);
+    public void setValueTo(Central central, String value) {
+        stringSetter.accept(central, value);
     }
 }

@@ -15,16 +15,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.parser;
+package org.ballerinalang.toml.parser;
 
-import org.ballerinalang.packerina.toml.model.Dependency;
-import org.ballerinalang.packerina.toml.model.Manifest;
-import org.ballerinalang.packerina.toml.model.fields.DependencyField;
-import org.ballerinalang.packerina.toml.model.fields.ManifestHeader;
-import org.ballerinalang.packerina.toml.model.fields.PackageField;
-import org.ballerinalang.packerina.toml.util.SingletonStack;
 import org.ballerinalang.toml.antlr4.TomlBaseListener;
 import org.ballerinalang.toml.antlr4.TomlParser;
+import org.ballerinalang.toml.model.Dependency;
+import org.ballerinalang.toml.model.Manifest;
+import org.ballerinalang.toml.model.fields.DependencyField;
+import org.ballerinalang.toml.model.fields.ManifestHeader;
+import org.ballerinalang.toml.model.fields.PackageField;
+import org.ballerinalang.toml.util.SingletonStack;
 
 import java.util.ArrayList;
 import java.util.List;

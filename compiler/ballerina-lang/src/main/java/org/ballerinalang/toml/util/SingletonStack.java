@@ -15,7 +15,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.util;
+package org.ballerinalang.toml.util;
 
 /**
  * This class can be used to handle a singleton content with one element.

@@ -15,16 +15,17 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.parser;
+package org.ballerinalang.toml.parser;
 
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.ballerinalang.packerina.toml.model.Manifest;
-import org.ballerinalang.packerina.toml.util.TomlProcessor;
+import org.ballerinalang.toml.model.Manifest;
+import org.ballerinalang.toml.util.TomlProcessor;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Manifest Processor which processes the toml file parsed and populate the Manifest POJO.
@@ -37,7 +38,7 @@ public class ManifestProcessor {
      * Get the char stream of the content from file.
      *
      * @param fileName path of the toml file
-     * @return charstream object
+     * @return manifest object
      * @throws IOException exception if the file cannot be found
      */
     public static Manifest parseTomlContentFromFile(String fileName) throws IOException {
@@ -49,10 +50,25 @@ public class ManifestProcessor {
      * Get the char stream from string content.
      *
      * @param content toml file content as a string
-     * @return charstream object
+     * @return manifest object
      */
     public static Manifest parseTomlContentFromString(String content) {
         ANTLRInputStream in = new ANTLRInputStream(content);
+        return getManifest(in);
+    }
+
+    /**
+     * Get the char stream from inputstream.
+     *
+     * @param inputStream inputstream of the toml file content
+     * @return manifest object
+     */
+    public static Manifest parseTomlContentAsStream(InputStream inputStream) {
+        ANTLRInputStream in = null;
+        try {
+            in = new ANTLRInputStream(inputStream);
+        } catch (IOException ignore) {
+        }
         return getManifest(in);
     }
 

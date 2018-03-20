@@ -15,25 +15,31 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model.fields;
-
-import java.util.Locale;
+package org.ballerinalang.toml.model;
 
 /**
- * Section headers valid in the manifest toml file.
+ * Defines the properties used in central.
  *
  * @since 0.964
  */
-public enum ManifestHeader {
-    PACKAGE, DEPENDENCIES, PATCHES, PROXY;
+public class Central {
+    private String accessToken;
 
     /**
-     * Check if the section header matches the toml header.
+     * Get the access token.
      *
-     * @param match section header in the toml file
-     * @return if it matches or not
+     * @return access token
      */
-    public boolean stringEquals(String match) {
-        return toString().toLowerCase(Locale.ENGLISH).equals(match);
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    /**
+     * Sets the value of the access token.
+     *
+     * @param accessToken access token
+     */
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 }

@@ -15,17 +15,17 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.parser;
+package org.ballerinalang.toml.parser;
 
-import org.ballerinalang.packerina.toml.model.Central;
-import org.ballerinalang.packerina.toml.model.Proxy;
-import org.ballerinalang.packerina.toml.model.Settings;
-import org.ballerinalang.packerina.toml.model.fields.CentralField;
-import org.ballerinalang.packerina.toml.model.fields.ProxyField;
-import org.ballerinalang.packerina.toml.model.fields.SettingHeaders;
-import org.ballerinalang.packerina.toml.util.SingletonStack;
 import org.ballerinalang.toml.antlr4.TomlBaseListener;
 import org.ballerinalang.toml.antlr4.TomlParser;
+import org.ballerinalang.toml.model.Central;
+import org.ballerinalang.toml.model.Proxy;
+import org.ballerinalang.toml.model.Settings;
+import org.ballerinalang.toml.model.fields.CentralField;
+import org.ballerinalang.toml.model.fields.ProxyField;
+import org.ballerinalang.toml.model.fields.SettingHeaders;
+import org.ballerinalang.toml.util.SingletonStack;
 
 /**
  * Custom listener which is extended from the Toml listener with our own custom logic.

@@ -15,10 +15,10 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.ballerinalang.packerina.toml.model.fields;
+package org.ballerinalang.toml.model.fields;
 
 
-import org.ballerinalang.packerina.toml.model.Manifest;
+import org.ballerinalang.toml.model.Manifest;
 
 import java.util.HashMap;
 import java.util.List;
