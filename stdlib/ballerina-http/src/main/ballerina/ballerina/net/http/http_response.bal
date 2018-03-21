@@ -122,8 +122,7 @@ public function <Response res> getCopyOfAllHeaders () returns (map) {
 @Param {value:"response: The response message"}
 @Return {value:"The JSON reresentation of the message payload"}
 public function <Response response> getJsonPayload () returns (json | mime:EntityError) {
-    var mimeEntity = response.getEntity();
-    match mimeEntity {
+    match response.getEntity() {
         mime:Entity entity => return entity.getJson();
         mime:EntityError err => return err;
     }
@@ -133,8 +132,7 @@ public function <Response response> getJsonPayload () returns (json | mime:Entit
 @Param {value:"response: The response message"}
 @Return {value:"The XML representation of the message payload"}
 public function <Response response> getXmlPayload () returns (xml | mime:EntityError) {
-    var mimeEntity = response.getEntity();
-    match mimeEntity {
+    match response.getEntity() {
         mime:Entity entity => return entity.getXml();
         mime:EntityError err => return err;
     }
@@ -144,8 +142,7 @@ public function <Response response> getXmlPayload () returns (xml | mime:EntityE
 @Param {value:"response: The response message"}
 @Return {value:"The string representation of the message payload"}
 public function <Response response> getStringPayload () returns (string | null | mime:EntityError) {
-    var mimeEntity = response.getEntity();
-    match mimeEntity {
+    match response.getEntity() {
         mime:Entity entity => return entity.getText();
         mime:EntityError err => return err;
     }
@@ -155,8 +152,7 @@ public function <Response response> getStringPayload () returns (string | null |
 @Param {value:"response: The response message"}
 @Return {value:"The blob representation of the message payload"}
 public function <Response response> getBinaryPayload () returns (blob | mime:EntityError) {
-    var mimeEntity = response.getEntity();
-    match mimeEntity {
+    match response.getEntity() {
         mime:Entity entity => return entity.getBlob();
         mime:EntityError err => return err;
     }
@@ -167,8 +163,7 @@ please use 'getMultiparts()' instead."}
 @Param {value:"response: The response message"}
 @Return {value:"A byte channel as the message payload"}
 public function <Response response> getByteChannel () returns (io:ByteChannel | mime:EntityError) {
-    var mimeEntity = response.getEntity();
-    match mimeEntity {
+    match response.getEntity() {
         mime:Entity entity => return entity.getByteChannel();
         mime:EntityError err => return err;
     }
@@ -178,8 +173,7 @@ public function <Response response> getByteChannel () returns (io:ByteChannel | 
 @Param {value:"response: The response message"}
 @Return {value:"Returns the body parts as an array of entities"}
 public function <Response response> getMultiparts () returns mime:Entity[] | mime:EntityError {
-    var mimeEntity = response.getEntity();
-    match mimeEntity {
+    match response.getEntity() {
         mime:Entity entity => return entity.getBodyParts();
         mime:EntityError err => return err;
         //any | null => return null;
@@ -268,8 +262,7 @@ public function <Response response> setByteChannel (io:ByteChannel payload) {
 @Return {value:"Return 'MediaType' struct"}
 function getMediaTypeFromResponse (Response response, string defaultContentType) returns (mime:MediaType) {
     mime:MediaType mediaType = mime:getMediaType(defaultContentType);
-    var contentTypeValue = response.getHeader(mime:CONTENT_TYPE);
-    match contentTypeValue {
+    match response.getHeader(mime:CONTENT_TYPE) {
         string contentType => return contentType != "" ? mime:getMediaType(contentType) : mediaType;
         any | null => return {};
     }
