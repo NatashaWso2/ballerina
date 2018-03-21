@@ -32,7 +32,7 @@ import java.util.function.BiConsumer;
  * @since 0.964
  */
 public enum PackageField {
-    NAME(Manifest::setName),
+    ORG_NAME(Manifest::setName),
     VERSION(Manifest::setVersion),
     DESCRIPTION(Manifest::setDescription),
     DOCUMENTATION(Manifest::setDocumentationURL),

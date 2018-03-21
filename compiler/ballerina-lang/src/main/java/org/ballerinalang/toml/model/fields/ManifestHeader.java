@@ -25,7 +25,7 @@ import java.util.Locale;
  * @since 0.964
  */
 public enum ManifestHeader {
-    PACKAGE, DEPENDENCIES, PATCHES, PROXY;
+    PROJECT, DEPENDENCIES, PATCHES;
 
     /**
      * Check if the section header matches the toml header.

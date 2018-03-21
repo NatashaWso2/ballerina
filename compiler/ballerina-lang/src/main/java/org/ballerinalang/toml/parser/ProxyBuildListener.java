@@ -20,8 +20,8 @@ package org.ballerinalang.toml.parser;
 import org.ballerinalang.toml.antlr4.TomlBaseListener;
 import org.ballerinalang.toml.antlr4.TomlParser;
 import org.ballerinalang.toml.model.Proxy;
-import org.ballerinalang.toml.model.fields.ManifestHeader;
 import org.ballerinalang.toml.model.fields.ProxyField;
+import org.ballerinalang.toml.model.fields.Section;
 import org.ballerinalang.toml.util.SingletonStack;
 import org.ballerinalang.toml.util.TomlUtils;
 
@@ -96,7 +96,7 @@ public class ProxyBuildListener extends TomlBaseListener {
      * @param value KeyvalContext object
      */
     private void setToProxy(String value) {
-        if (currentKey.present() && ManifestHeader.PROXY.stringEquals(currentHeader)) {
+        if (currentKey.present() && Section.PROXY.stringEquals(currentHeader)) {
             ProxyField proxyField = ProxyField.valueOfLowerCase(currentKey.pop());
             if (proxyField != null) {
                 proxyField.setValueTo(this.proxy, value);

@@ -155,8 +155,9 @@ public class ManifestBuildListener extends TomlBaseListener {
      * @param value KeyvalContext object
      */
     private void setToManifest(String value) {
-        if (currentKey.present() && ManifestHeader.PACKAGE.stringEquals(currentHeader)) {
-            PackageField packageFieldField = PackageField.valueOfLowerCase(currentKey.pop());
+        if (currentKey.present() && ManifestHeader.PROJECT.stringEquals(currentHeader)) {
+            String key = currentKey.pop().replaceAll("-" , "_");
+            PackageField packageFieldField = PackageField.valueOfLowerCase(key);
             if (packageFieldField != null) {
                 packageFieldField.setStringTo(this.manifest, value);
             }
@@ -175,8 +176,9 @@ public class ManifestBuildListener extends TomlBaseListener {
      * @param arrayValuesContext ArrayValuesContext object
      */
     private void setToManifest(TomlParser.ArrayValuesContext arrayValuesContext) {
-        if (currentKey.present() && ManifestHeader.PACKAGE.stringEquals(currentHeader)) {
-            PackageField packageFieldField = PackageField.valueOfLowerCase(currentKey.pop());
+        if (currentKey.present() && ManifestHeader.PROJECT.stringEquals(currentHeader)) {
+            String key = currentKey.pop().replaceAll("-" , "_");
+            PackageField packageFieldField = PackageField.valueOfLowerCase(key);
             if (packageFieldField != null) {
                 List<String> arrayElements = populateList(arrayValuesContext);
                 packageFieldField.setListTo(this.manifest, arrayElements);
