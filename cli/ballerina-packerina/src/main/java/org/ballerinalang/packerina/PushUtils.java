@@ -34,14 +34,19 @@ import org.wso2.ballerinalang.util.ExecutorUtils;
 import org.wso2.ballerinalang.util.HomeRepoUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 /**
  * This class provides util methods when pushing Ballerina packages to central and home repository.
@@ -62,7 +67,7 @@ public class PushUtils {
         Manifest manifest = readManifestConfigurations();
         if (manifest.getName() == null && manifest.getVersion() == null) {
             throw new BLangCompilerException("An org-name and package version is required when pushing. " +
-                    "This is not specified in Ballerina.toml inside the project");
+                                                     "This is not specified in Ballerina.toml inside the project");
         }
         String orgName = manifest.getName();
         String version = manifest.getVersion();
@@ -78,21 +83,36 @@ public class PushUtils {
             if (accessToken == null) {
                 // TODO: get bal home location dynamically
                 throw new BLangCompilerException("Access token is missing in ~/ballerina_home/Settings.toml file.\n" +
-                                                 "Please visit https://central.ballerina.io/cli-token");
+                                                         "Please visit https://central.ballerina.io/cli-token");
             }
+
+            // Read the Ballerina.md file content from the balo archive
+            String mdFileContent = getBallerinaMDFileContent(pkgPathFromPrjtDir.toString());
+            if (mdFileContent == null) {
+                throw new BLangCompilerException("Cannot find Ballerina.md file in the archived balo");
+            }
+
+            String description = readSummary(mdFileContent);
+            String homepageURL = manifest.getHomepageURL();
+            String repositoryURL = manifest.getRepositoryURL();
+            String authors = String.join(",", manifest.getAuthors());
+            String keywords = String.join(",", manifest.getKeywords());
+            String license = manifest.getLicense();
+
             // Push package to central
             String resourcePath = resolvePkgPathInRemoteRepo(packageID);
             URI balxPath = URI.create(String.valueOf(PushUtils.class.getClassLoader().getResource
                     ("ballerina.push.balx")));
             String msg = orgName + "/" + packageName + ":" + version + " [project repo -> central]";
-            ExecutorUtils.execute(balxPath, accessToken, resourcePath, pkgPathFromPrjtDir.toString(), msg);
+            ExecutorUtils.execute(balxPath, accessToken, mdFileContent, description, homepageURL, repositoryURL,
+                                  authors, keywords, license, resourcePath, pkgPathFromPrjtDir.toString(), msg);
         } else {
             if (!installToRepo.equals("home")) {
                 throw new BLangCompilerException("Unknown repository provided to push the package");
             }
             Path balHomeDir = HomeRepoUtils.createAndGetHomeReposPath();
             Path targetDirectoryPath = Paths.get(balHomeDir.toString(), "repo", orgName, packageName, version,
-                    packageName + ".zip");
+                                                 packageName + ".zip");
             if (Files.exists(targetDirectoryPath)) {
                 throw new BLangCompilerException("Ballerina package exists in the home repository");
             } else {
@@ -168,5 +188,58 @@ public class PushUtils {
             return settings.getCentral().getAccessToken();
         }
         return null;
+    }
+
+    /**
+     * Reads the content of Ballerina.md inside the archived balo.
+     *
+     * @param archivedFilePath balo file path of the package
+     * @return content of Ballerina.md as a string
+     */
+    private static String getBallerinaMDFileContent(String archivedFilePath) {
+        ZipFile zipFile = null;
+        try {
+            zipFile = new ZipFile(archivedFilePath);
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = entries.nextElement();
+                if (entry.getName().equalsIgnoreCase("Ballerina.md")) {
+                    InputStream stream = zipFile.getInputStream(entry);
+                    Scanner scanner = new Scanner(stream, "UTF-8").useDelimiter("\\A");
+                    return scanner.hasNext() ? scanner.next() : "";
+                }
+            }
+        } catch (IOException ignore) {
+        } finally {
+            try {
+                if (zipFile != null) {
+                    zipFile.close();
+                }
+            } catch (IOException ignore) {
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Read summary of the package from Ballerina.md file.
+     *
+     * @param mdFileContent full content of Ballerina.md
+     * @return summary of the package
+     */
+    private static String readSummary(String mdFileContent) {
+        if (mdFileContent.isEmpty()) {
+            throw new BLangCompilerException("Ballerina.md in the archived balo is empty");
+        }
+        int newLineIndex = mdFileContent.indexOf("\n");
+        if (newLineIndex == -1) {
+            throw new BLangCompilerException("Error occurred when reading Ballerina.md");
+        }
+        String firstLine = mdFileContent.substring(0, newLineIndex);
+        if (firstLine.length() > 50) {
+            throw new BLangCompilerException("Summary of the package exceeds 50 characters");
+        }
+        return firstLine;
     }
 }

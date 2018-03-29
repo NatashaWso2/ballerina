@@ -3,7 +3,8 @@ import ballerina/io;
 import ballerina/mime;
 import ballerina/net.http;
 
-function pushPackage (string accessToken, string url, string dirPath, string msg) {
+function pushPackage (string accessToken, string mdFileContent, string description, string homePageURL, string repositoryURL,
+    string authors, string keywords, string license, string url, string dirPath, string msg) {
     endpoint http:ClientEndpoint httpEndpoint {
         targets: [
         {
@@ -19,18 +20,29 @@ function pushPackage (string accessToken, string url, string dirPath, string msg
         }
         ]
     };
+
+    mime:Entity mdFileContentBodyPart = addStringBodyParts("summary", mdFileContent);
+    mime:Entity descriptionBodyPart = addStringBodyParts("description", description);
+    mime:Entity homePageURLBodyPart = addStringBodyParts("homePageURL", homePageURL);
+    mime:Entity repositoryURLBodyPart = addStringBodyParts("repositoryURL", repositoryURL);
+    mime:Entity authorsBodyPart = addStringBodyParts("authors", authors);
+    mime:Entity keywordsBodyPart = addStringBodyParts("keywords", keywords);
+    mime:Entity licenseBodyPart = addStringBodyParts("license", license);
+
+    // Artifact
     mime:Entity filePart = {};
     mime:MediaType contentTypeOfFilePart = mime:getMediaType(mime:APPLICATION_OCTET_STREAM);
     filePart.contentType = contentTypeOfFilePart;
+    filePart.contentDisposition = getContentDispositionForFormData("artifact");
     file:File fileHandler = {path:dirPath};
     filePart.setFileAsEntityBody(fileHandler);
-    mime:Entity[] bodyParts = [filePart];
+    
+    mime:Entity[] bodyParts = [filePart, mdFileContentBodyPart, descriptionBodyPart, homePageURLBodyPart, repositoryURLBodyPart, authorsBodyPart, keywordsBodyPart, licenseBodyPart];
 
     http:Request req = {};
     http:Response res = {};
     req.addHeader("Authorization", "Bearer " + accessToken);
     req.setMultiparts(bodyParts, mime:MULTIPART_FORM_DATA);
-    
     var httpResponse = httpEndpoint -> post("", req);
     match httpResponse {
      http:HttpConnectorError errRes => {
@@ -58,5 +70,21 @@ function pushPackage (string accessToken, string url, string dirPath, string msg
 }
 
 function main (string[] args) {
-    pushPackage(args[0], args[1], args[2], args[3]);
+    pushPackage(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10]);
+}
+
+function getContentDispositionForFormData(string partName) returns (mime:ContentDisposition){
+    mime:ContentDisposition contentDisposition = {};
+    contentDisposition.name =  partName;
+    contentDisposition.disposition = "form-data";
+    return contentDisposition;
+}
+
+function addStringBodyParts (string key, string value) returns (mime:Entity) {
+    mime:Entity stringBodyPart = {};
+    mime:MediaType contentTypeOfStringPart = mime:getMediaType(mime:TEXT_PLAIN);
+    stringBodyPart.contentType = contentTypeOfStringPart;
+    stringBodyPart.contentDisposition = getContentDispositionForFormData(key);
+    stringBodyPart.setText(value);
+    return stringBodyPart;
 }
