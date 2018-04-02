@@ -3,7 +3,7 @@ package ballerina.pull;
 import ballerina/file;
 import ballerina/io;
 import ballerina/mime;
-import ballerina/net.http;
+import ballerina/http;
 
 function pullPackage (string url, string destDirPath, string fullPkgPath, string fileSeparator) {
     endpoint http:ClientEndpoint httpEndpoint {
@@ -59,18 +59,28 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
             error conversionErr => throw conversionErr;
             int size => pkgSize = size;
         }
+
+        // Get file location from Location header
+        string locationHeaderVal;
+        if (res.hasHeader("Location")) {
+            locationHeaderVal = res.getHeader("Location");
+        } else {
+            error err = {message:"package location information is missing from the remote repository"};
+            throw err;
+        }
+
+        http:Response respLocation = getPackageFromRemote(locationHeaderVal);
         io:ByteChannel sourceChannel = {};
-        var srcChannel = res.getByteChannel();
+        var srcChannel = respLocation.getByteChannel();
         match srcChannel {
             mime:EntityError errRes => {
                 var errorResp = <error> errRes;
                 match errorResp {
                     error err =>  throw err;
                 }
-            }  
+            }
             io:ByteChannel channel => sourceChannel = channel;
         }
-
         // Get the package version from the canonical header of the response
         string linkHeaderVal;
         if (res.hasHeader("Link")) {
@@ -230,4 +240,36 @@ function createDirectories (string directoryPath) returns (boolean) {
     } else {
         return false;
     }
+}
+
+function getPackageFromRemote(string url) returns (http:Response) {
+    endpoint http:ClientEndpoint httpEndpoint {
+        targets: [
+            {
+                uri: url,
+                secureSocket: {
+                    trustStore: {
+                        filePath: "${ballerina.home}/bre/security/ballerinaTruststore.p12",
+                        password: "ballerina"
+                    },
+                    hostNameVerification:false,
+                    sessionCreation: true
+                }
+             }
+        ]
+    };
+    http:Request req = {};
+    http:Response res = {};
+    req.addHeader("Accept-Encoding", "identity");
+    var httpResponse = httpEndpoint -> get("", req);
+    match httpResponse {
+        http:HttpConnectorError errRes => {
+            var errorResp = <error> errRes;
+            match errorResp {
+                error err =>  throw err;
+            }
+        }
+        http:Response response => res = response;
+    }
+    return res;
 }
