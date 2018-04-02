@@ -69,9 +69,9 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
             throw err;
         }
 
-        http:Response respLocation = getPackageFromRemote(locationHeaderVal);
+        http:Response respWithPackage = getPackageFromRemote(locationHeaderVal);
         io:ByteChannel sourceChannel = {};
-        var srcChannel = respLocation.getByteChannel();
+        var srcChannel = respWithPackage.getByteChannel();
         match srcChannel {
             mime:EntityError errRes => {
                 var errorResp = <error> errRes;
