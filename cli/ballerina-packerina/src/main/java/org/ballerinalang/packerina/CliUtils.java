@@ -25,6 +25,9 @@ import org.wso2.ballerinalang.util.HomeRepoUtils;
 
 import java.io.IOException;
 
+/**
+ * Class which holds the utility methods for cli commands.
+ */
 public class CliUtils {
 
     /**
