@@ -31,7 +31,7 @@ public class Manifest {
     private String version = "";
     private List<String> authors = new ArrayList<>();
     private List<String> keywords = new ArrayList<>();
-    private String documentationURL = ""; //apiDocURL
+    private String documentationURL = "";
     private String homepageURL = "";
     private String repositoryURL = "";
     private String description = "";

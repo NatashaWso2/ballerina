@@ -7,7 +7,7 @@ import ballerina/http;
 
 function pullPackage (string url, string destDirPath, string fullPkgPath, string fileSeparator) {
     endpoint http:ClientEndpoint httpEndpoint {
-        targets: [
+        targets : [
         {
             url: url,
             secureSocket: {
@@ -19,7 +19,8 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
                 sessionCreation: true
              }
         }
-        ]
+        ],
+        followRedirects : { enabled : true, maxCount : 5 }
     };
     http:Request req = {};
     http:Response res = {};
@@ -60,18 +61,8 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
             int size => pkgSize = size;
         }
 
-        // Get file location from Location header
-        string locationHeaderVal;
-        if (res.hasHeader("Location")) {
-            locationHeaderVal = res.getHeader("Location");
-        } else {
-            error err = {message:"package location information is missing from the remote repository"};
-            throw err;
-        }
-
-        http:Response respWithPackage = getPackageFromRemote(locationHeaderVal);
         io:ByteChannel sourceChannel = {};
-        var srcChannel = respWithPackage.getByteChannel();
+        var srcChannel = res.getByteChannel();
         match srcChannel {
             mime:EntityError errRes => {
                 var errorResp = <error> errRes;
@@ -81,17 +72,17 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
             }
             io:ByteChannel channel => sourceChannel = channel;
         }
-        // Get the package version from the canonical header of the response
-        string linkHeaderVal;
-        if (res.hasHeader("Link")) {
-            linkHeaderVal = res.getHeader("Link");
+        // Get the package version from the raw-path header of the response
+        string rawPathVal;
+        if (res.hasHeader("raw-path")) {
+            rawPathVal = res.getHeader("raw-path");
         } else {
             error err = {message:"package version information is missing from the remote repository"};
             throw err;
         }
-       
-        string canonicalLinkURL = linkHeaderVal.subString(linkHeaderVal.indexOf("<") + 1, linkHeaderVal.indexOf(">"));
-        string pkgVersion = canonicalLinkURL.subString(canonicalLinkURL.lastIndexOf("/") + 1, canonicalLinkURL.length());
+
+        int indexOfVersion = rawPathVal.lastIndexOf("/");
+        string pkgVersion = rawPathVal.subString(indexOfVersion + 1, rawPathVal.length());
 
         string pkgName = fullPkgPath.subString(fullPkgPath.lastIndexOf("/") + 1, fullPkgPath.length());
         fullPkgPath = fullPkgPath + ":" + pkgVersion;
@@ -240,36 +231,4 @@ function createDirectories (string directoryPath) returns (boolean) {
     } else {
         return false;
     }
-}
-
-function getPackageFromRemote(string url) returns (http:Response) {
-    endpoint http:ClientEndpoint httpEndpoint {
-        targets: [
-            {
-                uri: url,
-                secureSocket: {
-                    trustStore: {
-                        filePath: "${ballerina.home}/bre/security/ballerinaTruststore.p12",
-                        password: "ballerina"
-                    },
-                    hostNameVerification:false,
-                    sessionCreation: true
-                }
-             }
-        ]
-    };
-    http:Request req = {};
-    http:Response res = {};
-    req.addHeader("Accept-Encoding", "identity");
-    var httpResponse = httpEndpoint -> get("", req);
-    match httpResponse {
-        http:HttpConnectorError errRes => {
-            var errorResp = <error> errRes;
-            match errorResp {
-                error err =>  throw err;
-            }
-        }
-        http:Response response => res = response;
-    }
-    return res;
 }

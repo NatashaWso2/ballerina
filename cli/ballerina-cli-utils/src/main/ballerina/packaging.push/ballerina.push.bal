@@ -5,7 +5,7 @@ import ballerina/io;
 import ballerina/mime;
 import ballerina/http;
 
-function pushPackage (string accessToken, string mdFileContent, string description, string homePageURL, string repositoryURL,
+function pushPackage (string accessToken, string mdFileContent, string summary, string homePageURL, string repositoryURL,
     string apiDocURL, string authors, string keywords, string license, string url, string dirPath, string msg) {
     endpoint http:ClientEndpoint httpEndpoint {
         targets: [
@@ -24,7 +24,7 @@ function pushPackage (string accessToken, string mdFileContent, string descripti
     };
 
     mime:Entity mdFileContentBodyPart = addStringBodyParts("description", mdFileContent);
-    mime:Entity descriptionBodyPart = addStringBodyParts("summary", description);
+    mime:Entity summaryBodyPart = addStringBodyParts("summary", summary);
     mime:Entity homePageURLBodyPart = addStringBodyParts("websiteURL", homePageURL);
     mime:Entity repositoryURLBodyPart = addStringBodyParts("repositoryURL", repositoryURL);
     mime:Entity apiDocURLBodyPart = addStringBodyParts("apiDocURL", apiDocURL);
@@ -40,7 +40,7 @@ function pushPackage (string accessToken, string mdFileContent, string descripti
     file:File fileHandler = {path:dirPath};
     filePart.setFileAsEntityBody(fileHandler);
     
-    mime:Entity[] bodyParts = [filePart, mdFileContentBodyPart, descriptionBodyPart, homePageURLBodyPart, repositoryURLBodyPart,
+    mime:Entity[] bodyParts = [filePart, mdFileContentBodyPart, summaryBodyPart, homePageURLBodyPart, repositoryURLBodyPart,
                                           apiDocURLBodyPart, authorsBodyPart, keywordsBodyPart, licenseBodyPart];
 
     http:Request req = {};
