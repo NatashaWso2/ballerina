@@ -4,7 +4,7 @@ import ballerina/mime;
 import ballerina/http;
 import ballerina/time;
 
-function search (string url, string querySearched) {
+function search (string url, string querySearched, string hostName, string port, string username, string password) {
     endpoint http:ClientEndpoint httpEndpoint {
         targets: [
         {
@@ -18,7 +18,8 @@ function search (string url, string querySearched) {
                 sessionCreation: true
             }
         }
-        ]
+        ],
+        proxy : getProxyConfigurations(hostName, port, username, password)
     };
 
     http:Request req = {};
@@ -108,5 +109,21 @@ function getDateCreated(json createdDate) returns string {
 }
 
 function main (string[] args) {
-    search(args[0], args[1]);
+    search(args[0], args[1], args[2], args[3], args[4], args[5]);
+}
+
+function getProxyConfigurations(string hostName, string port, string username, string password) returns (http:Proxy) {
+    http:Proxy proxy = {};
+    if (port != "") {
+        int portInt;
+        var conversion = <int> port;
+        match conversion {
+            error conversionErr => throw conversionErr;
+            int proxyPort => portInt = proxyPort;
+        }
+        proxy = { host : hostName, port : portInt , userName: username, password : password };
+    } else {
+        proxy = {};
+    }
+    return proxy;
 }

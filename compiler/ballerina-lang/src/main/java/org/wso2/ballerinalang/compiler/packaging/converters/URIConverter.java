@@ -3,8 +3,12 @@ package org.wso2.ballerinalang.compiler.packaging.converters;
 import org.ballerinalang.model.elements.PackageID;
 import org.ballerinalang.repository.PackageSourceEntry;
 import org.ballerinalang.spi.EmbeddedExecutor;
+import org.ballerinalang.toml.model.Proxy;
+import org.ballerinalang.toml.model.Settings;
+import org.ballerinalang.toml.parser.SettingsProcessor;
 import org.ballerinalang.util.EmbeddedExecutorProvider;
 import org.wso2.ballerinalang.compiler.packaging.Patten;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 import org.wso2.ballerinalang.util.HomeRepoUtils;
 
 import java.io.File;
@@ -69,9 +73,11 @@ public class URIConverter implements Converter<URI> {
         createDirectory(destDirPath);
         try {
             String fullPkgPath = orgName + "/" + pkgName;
+            Proxy proxy = readProxyConfigurations();
             EmbeddedExecutor executor = EmbeddedExecutorProvider.getInstance().getExecutor();
             executor.execute("packaging.pull/ballerina.pull.balx", u.toString(), destDirPath.toString(),
-                             fullPkgPath, File.separator);
+                             fullPkgPath, File.separator, proxy.getHost(), proxy.getPort(), proxy.getUserName(),
+                             proxy.getPassword());
             // TODO Simplify using ZipRepo
             Patten pattern = new Patten(Patten.WILDCARD_DIR,
                                         Patten.path(pkgName + ".zip"),
@@ -80,6 +86,31 @@ public class URIConverter implements Converter<URI> {
         } catch (Exception ignore) {
         }
         return Stream.of();
+    }
+
+    /**
+     * Read Settings.toml to populate the configurations.
+     *
+     * @return settings object
+     */
+    private Settings readSettings() {
+        String tomlFilePath = HomeRepoUtils.createAndGetHomeReposPath().resolve(ProjectDirConstants.SETTINGS_FILE_NAME)
+                                           .toString();
+        try {
+            return SettingsProcessor.parseTomlContentFromFile(tomlFilePath);
+        } catch (IOException e) {
+            return new Settings();
+        }
+    }
+
+    /**
+     * Read proxy configurations from the SettingHeaders.toml file.
+     *
+     * @return array with proxy configurations
+     */
+    private Proxy readProxyConfigurations() {
+        Settings settings = readSettings();
+        return settings.getProxy();
     }
 
     @Override

@@ -18,6 +18,7 @@
 package org.ballerinalang.packerina;
 
 import org.ballerinalang.spi.EmbeddedExecutor;
+import org.ballerinalang.toml.model.Proxy;
 import org.ballerinalang.util.EmbeddedExecutorProvider;
 
 /**
@@ -35,7 +36,9 @@ public class SearchUtils {
      */
     public static void searchInCentral(String argument) {
         String query = "?keyword=" + argument;
+        Proxy proxy = CliUtils.readProxyConfigurations();
         EmbeddedExecutor executor = EmbeddedExecutorProvider.getInstance().getExecutor();
-        executor.execute("packaging.search/ballerina.search.balx", BALLERINA_STAGING_URL, query);
+        executor.execute("packaging.search/ballerina.search.balx", BALLERINA_STAGING_URL, query,
+                         proxy.getHost(), proxy.getPort(), proxy.getUserName(), proxy.getPassword());
     }
 }

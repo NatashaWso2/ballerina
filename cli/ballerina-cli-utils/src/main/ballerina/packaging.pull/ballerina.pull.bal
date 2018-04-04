@@ -5,7 +5,8 @@ import ballerina/io;
 import ballerina/mime;
 import ballerina/http;
 
-function pullPackage (string url, string destDirPath, string fullPkgPath, string fileSeparator) {
+function pullPackage (string url, string destDirPath, string fullPkgPath, string fileSeparator, string hostName,
+                      string port, string username, string password) {
     endpoint http:ClientEndpoint httpEndpoint {
         targets: [
         {
@@ -19,7 +20,8 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
                 sessionCreation: true
              }
         }
-        ]
+        ],
+        proxy : getProxyConfigurations(hostName, port, username, password)
     };
     http:Request req = {};
     http:Response res = {};
@@ -109,7 +111,7 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
 }
 
 public function main(string[] args){
-    pullPackage(args[0], args[1], args[2], args[3]);
+    pullPackage(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
 }
 
 
@@ -230,4 +232,20 @@ function createDirectories (string directoryPath) returns (boolean) {
     } else {
         return false;
     }
+}
+
+function getProxyConfigurations(string hostName, string port, string username, string password) returns (http:Proxy) {
+    http:Proxy proxy = {};
+    if (port != "") {
+        int portInt;
+        var conversion = <int> port;
+        match conversion {
+            error conversionErr => throw conversionErr;
+            int proxyPort => portInt = proxyPort;
+        }
+        proxy = { host : hostName, port : portInt , userName: username, password : password };
+    } else {
+        proxy = {};
+    }
+    return proxy;
 }

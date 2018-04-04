@@ -21,6 +21,7 @@ import org.ballerinalang.compiler.BLangCompilerException;
 import org.ballerinalang.model.elements.PackageID;
 import org.ballerinalang.spi.EmbeddedExecutor;
 import org.ballerinalang.toml.model.Manifest;
+import org.ballerinalang.toml.model.Proxy;
 import org.ballerinalang.toml.model.Settings;
 import org.ballerinalang.toml.parser.ManifestProcessor;
 import org.ballerinalang.toml.parser.SettingsProcessor;
@@ -84,9 +85,12 @@ public class PushUtils {
             // Push package to central
             String resourcePath = resolvePkgPathInRemoteRepo(packageID);
             String msg = orgName + "/" + packageName + ":" + version + " [project repo -> central]";
+            Proxy proxy = CliUtils.readProxyConfigurations();
+
             EmbeddedExecutor executor = EmbeddedExecutorProvider.getInstance().getExecutor();
             executor.execute("packaging.push/ballerina.push.balx", accessToken, resourcePath,
-                             pkgPathFromPrjtDir.toString(), msg);
+                             pkgPathFromPrjtDir.toString(), msg, proxy.getHost(), proxy.getPort(), proxy.getUserName(),
+                             proxy.getPassword());
         } else {
             if (!installToRepo.equals("home")) {
                 throw new BLangCompilerException("Unknown repository provided to push the package");
@@ -144,27 +148,12 @@ public class PushUtils {
     }
 
     /**
-     * Read Settings.toml to populate the configurations.
-     *
-     * @return settings object
-     */
-    private static Settings readSettings() {
-        String tomlFilePath = HomeRepoUtils.createAndGetHomeReposPath().resolve(ProjectDirConstants.SETTINGS_FILE_NAME)
-                                           .toString();
-        try {
-            return SettingsProcessor.parseTomlContentFromFile(tomlFilePath);
-        } catch (IOException e) {
-            return new Settings();
-        }
-    }
-
-    /**
      * Read the access token generated for the CLI.
      *
      * @return access token for generated for the CLI
      */
     private static String getAccessTokenOfCLI() {
-        Settings settings = readSettings();
+        Settings settings = CliUtils.readSettings();
         if (settings.getCentral() != null) {
             return settings.getCentral().getAccessToken();
         }

@@ -5,7 +5,8 @@ import ballerina/io;
 import ballerina/mime;
 import ballerina/http;
 
-function pushPackage (string accessToken, string url, string dirPath, string msg) {
+function pushPackage (string accessToken, string url, string dirPath, string msg, string hostName, string port,
+                      string username, string password) {
     endpoint http:ClientEndpoint httpEndpoint {
         targets: [
         {
@@ -19,7 +20,8 @@ function pushPackage (string accessToken, string url, string dirPath, string msg
                 sessionCreation: true
             }
         }
-        ]
+        ],
+        proxy : getProxyConfigurations(hostName, port, username, password)
     };
     mime:Entity filePart = {};
     mime:MediaType contentTypeOfFilePart = mime:getMediaType(mime:APPLICATION_OCTET_STREAM);
@@ -60,5 +62,21 @@ function pushPackage (string accessToken, string url, string dirPath, string msg
 }
 
 function main (string[] args) {
-    pushPackage(args[0], args[1], args[2], args[3]);
+    pushPackage(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
+}
+
+function getProxyConfigurations(string hostName, string port, string username, string password) returns (http:Proxy) {
+    http:Proxy proxy = {};
+    if (port != "") {
+        int portInt;
+        var conversion = <int> port;
+        match conversion {
+            error conversionErr => throw conversionErr;
+            int proxyPort => portInt = proxyPort;
+        }
+        proxy = { host : hostName, port : portInt , userName: username, password : password };
+    } else {
+        proxy = {};
+    }
+    return proxy;
 }
