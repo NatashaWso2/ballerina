@@ -1,5 +1,4 @@
-// Generated from BallerinaParser.g4 by ANTLR 4.5.3
-package org.wso2.ballerinalang.compiler.parser.antlr4;
+package org.wso2.ballerinalang.compiler.parser.antlr4;// Generated from BallerinaParser.g4 by ANTLR 4.5.3
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -23,18 +22,6 @@ public class BallerinaParserBaseListener implements BallerinaParserListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitCompilationUnit(BallerinaParser.CompilationUnitContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterPackageDeclaration(BallerinaParser.PackageDeclarationContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitPackageDeclaration(BallerinaParser.PackageDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

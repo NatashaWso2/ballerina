@@ -144,17 +144,17 @@ public class BLangParserListener extends BallerinaParserBaseListener {
         this.pkgBuilder.endCompilationUnit(getWS(ctx));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void exitPackageDeclaration(BallerinaParser.PackageDeclarationContext ctx) {
-        if (ctx.exception != null) {
-            return;
-        }
-
-        this.pkgBuilder.setPackageDeclaration(getCurrentPos(ctx), getWS(ctx), this.pkgNameComps, this.pkgVersion);
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public void exitPackageDeclaration(BallerinaParser.PackageDeclarationContext ctx) {
+//        if (ctx.exception != null) {
+//            return;
+//        }
+//
+//        this.pkgBuilder.setPackageDeclaration(getCurrentPos(ctx), getWS(ctx), this.pkgNameComps, this.pkgVersion);
+//    }
 
     /**
      * {@inheritDoc}
