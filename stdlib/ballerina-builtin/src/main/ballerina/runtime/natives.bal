@@ -14,8 +14,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.runtime;
-
 @Description {value:"Halts the current worker for a predefined amount of time."}
 @Param {value:"millis: Amount of time to sleep in milliseconds"}
 public native function sleepCurrentWorker (int millis);
