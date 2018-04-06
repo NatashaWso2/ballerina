@@ -23,31 +23,31 @@ function pushPackage (string accessToken, string mdFileContent, string summary, 
         ]
     };
 
-    mime:Entity mdFileContentBodyPart = addStringBodyParts("description", mdFileContent);
-    mime:Entity summaryBodyPart = addStringBodyParts("summary", summary);
-    mime:Entity homePageURLBodyPart = addStringBodyParts("websiteURL", homePageURL);
-    mime:Entity repositoryURLBodyPart = addStringBodyParts("repositoryURL", repositoryURL);
-    mime:Entity apiDocURLBodyPart = addStringBodyParts("apiDocURL", apiDocURL);
-    mime:Entity authorsBodyPart = addStringBodyParts("authors", authors);
-    mime:Entity keywordsBodyPart = addStringBodyParts("keywords", keywords);
-    mime:Entity licenseBodyPart = addStringBodyParts("license", license);
+    // mime:Entity mdFileContentBodyPart = addStringBodyParts("description", mdFileContent);
+    // mime:Entity summaryBodyPart = addStringBodyParts("summary", summary);
+    // mime:Entity homePageURLBodyPart = addStringBodyParts("websiteURL", homePageURL);
+    // mime:Entity repositoryURLBodyPart = addStringBodyParts("repositoryURL", repositoryURL);
+    // mime:Entity apiDocURLBodyPart = addStringBodyParts("apiDocURL", apiDocURL);
+    // mime:Entity authorsBodyPart = addStringBodyParts("authors", authors);
+    // mime:Entity keywordsBodyPart = addStringBodyParts("keywords", keywords);
+    // mime:Entity licenseBodyPart = addStringBodyParts("license", license);
 
     // Artifact
     mime:Entity filePart = {};
     mime:MediaType contentTypeOfFilePart = mime:getMediaType(mime:APPLICATION_OCTET_STREAM);
     filePart.contentType = contentTypeOfFilePart;
-    filePart.contentDisposition = getContentDispositionForFormData("artifact");
+    filePart.contentDisposition = getContentDispositionForFormData("\"artifact\"");
     file:File fileHandler = {path:dirPath};
     filePart.setFileAsEntityBody(fileHandler);
     
-    mime:Entity[] bodyParts = [filePart, mdFileContentBodyPart, summaryBodyPart, homePageURLBodyPart, repositoryURLBodyPart,
-                                          apiDocURLBodyPart, authorsBodyPart, keywordsBodyPart, licenseBodyPart];
+    mime:Entity[] bodyParts = [filePart];
 
     http:Request req = {};
     http:Response res = {};
     req.addHeader("Authorization", "Bearer " + accessToken);
     req.setMultiparts(bodyParts, mime:MULTIPART_FORM_DATA);
     var httpResponse = httpEndpoint -> post("", req);
+    io:println(httpResponse);
     match httpResponse {
      http:HttpConnectorError errRes => {
          var errorResp = <error> errRes;
@@ -66,7 +66,7 @@ function pushPackage (string accessToken, string mdFileContent, string summary, 
                     error err =>  throw err;
                 }
             }  
-            json jsonObj => io:println(jsonObj.msg.toString());            
+            json jsonObj => io:println(jsonObj.message.toString());            
         }
     } else {
         io:println(msg);
@@ -74,7 +74,9 @@ function pushPackage (string accessToken, string mdFileContent, string summary, 
 }
 
 function main (string[] args) {
-    pushPackage(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
+    // pushPackage(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11]);
+        pushPackage("", "", "", "", "", "","", "","", "https://api.staging-central.ballerina.io/packages/natasha/hello/3.2.1", "/home/natasha/Desktop/hello.zip","Successful");
+
 }
 
 function getContentDispositionForFormData(string partName) returns (mime:ContentDisposition){

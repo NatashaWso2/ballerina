@@ -26,6 +26,7 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
     http:Response res = {};
     req.addHeader("Accept-Encoding", "identity");
     var httpResponse = httpEndpoint -> get("", req);
+    io:println(httpResponse);
     match httpResponse {
      http:HttpConnectorError errRes => {
          var errorResp = <error> errRes;
@@ -44,7 +45,7 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
                     error err =>  throw err;
                 }
             }
-            json jsonObj => io:println(jsonObj.msg.toString());
+            json jsonObj => io:println(jsonObj.message.toString());
         }
     } else {
         string contentLengthHeader;
@@ -81,8 +82,15 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
             throw err;
         }
 
-        int indexOfVersion = rawPathVal.lastIndexOf("/");
-        string pkgVersion = rawPathVal.subString(indexOfVersion + 1, rawPathVal.length());
+        string pkgVersion;
+        string [] pathArray = rawPathVal.split("/");
+        int sizeOfArray = lengthof pathArray;
+        if (sizeOfArray > 3) {
+            pkgVersion = pathArray[sizeOfArray - 2];
+        } else {
+            error err = {message:"package version information is missing from the remote repository"};
+            throw err;
+        }
 
         string pkgName = fullPkgPath.subString(fullPkgPath.lastIndexOf("/") + 1, fullPkgPath.length());
         fullPkgPath = fullPkgPath + ":" + pkgVersion;
@@ -110,7 +118,9 @@ function pullPackage (string url, string destDirPath, string fullPkgPath, string
 }
 
 public function main(string[] args){
-    pullPackage(args[0], args[1], args[2], args[3]);
+    // pullPackage(args[0], args[1], args[2], args[3]);
+    pullPackage("https://api.staging-central.ballerina.io/packages/natasha/hello/2.0.0", "/home/natasha/Desktop/package", "natasha/hello", "/");
+
 }
 
 
