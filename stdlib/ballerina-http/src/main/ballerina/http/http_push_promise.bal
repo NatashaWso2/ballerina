@@ -1,4 +1,4 @@
-package ballerina.http;
+
 
 @Description { value:"Represents a HTTP/2 Push Promise"}
 @Field {value:"path: Resource path"}

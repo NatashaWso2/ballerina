@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.http;
+
 
 @Description {value:"Representation of an API Endpoint"}
 @Field {value:"config: ServiceEndpointConfiguration instance"}

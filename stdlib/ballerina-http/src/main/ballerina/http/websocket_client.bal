@@ -1,4 +1,4 @@
-package ballerina.http;
+
 
 public type WebSocketClient object {
     public {

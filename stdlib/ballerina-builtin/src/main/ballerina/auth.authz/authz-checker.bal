@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.auth.authz;
+
 
 import ballerina/caching;
 import ballerina/auth.authz.permissionstore;

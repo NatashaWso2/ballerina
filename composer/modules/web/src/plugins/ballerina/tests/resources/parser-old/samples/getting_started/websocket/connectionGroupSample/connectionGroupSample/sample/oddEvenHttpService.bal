@@ -1,4 +1,4 @@
-package connectionGroupSample.sample;
+
 
 import ballerina/lang.messages;
 import ballerina/net.ws;

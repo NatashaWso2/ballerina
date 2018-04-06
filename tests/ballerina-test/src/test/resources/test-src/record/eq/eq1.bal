@@ -1,4 +1,4 @@
-package eq;
+
 
 public type person {
     int age;

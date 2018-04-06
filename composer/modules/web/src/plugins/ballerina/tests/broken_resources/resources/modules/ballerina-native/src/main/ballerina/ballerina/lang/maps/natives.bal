@@ -1,4 +1,4 @@
-package ballerina.lang.maps;
+
 
 import ballerina/doc;
 

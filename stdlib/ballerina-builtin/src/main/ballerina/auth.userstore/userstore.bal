@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.auth.userstore;
+
 
 @Description {value:"Represents the user store. Any type of implementation, such as ldap, jdbc, file based,
 etc. should be struct-wise similar"}

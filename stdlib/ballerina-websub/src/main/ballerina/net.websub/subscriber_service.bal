@@ -1,4 +1,4 @@
-package ballerina.net.websub;
+
 
 public struct SubscriberService {
 }

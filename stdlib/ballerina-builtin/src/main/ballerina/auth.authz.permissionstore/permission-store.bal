@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.auth.authz.permissionstore;
+
 
 @Description {value:"Represents the permission store. Any implementation of the Permission store should be
 struct-wise similar"}

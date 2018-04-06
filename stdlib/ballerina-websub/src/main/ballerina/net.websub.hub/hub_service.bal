@@ -1,4 +1,4 @@
-package ballerina.net.websub.hub;
+
 
 import ballerina/collections;
 import ballerina/sql;

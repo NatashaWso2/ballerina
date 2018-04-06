@@ -1,4 +1,4 @@
-package globalvar.pkg.varpkg;
+
 
 public int glbVarInt = 22343;
 public string glbVarString = "stringval";

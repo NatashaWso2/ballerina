@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.util;
+
 import ballerina/io;
 
 @Description {value:"Locale type represents specific geographical, political, or cultural region."}

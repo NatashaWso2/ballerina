@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.http;
+
 
 import ballerina/auth.utils;
 import ballerina/auth.authz;

@@ -1,4 +1,4 @@
-package ballerina.jms;
+
 
 import ballerina/log;
 

@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.config;
+
 
 @Description {value:"Retrieves the specified configuration value as a string"}
 @Param {value:"configKey: The configuration to be retrieved" }

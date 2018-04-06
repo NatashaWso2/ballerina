@@ -1,4 +1,4 @@
-package a.b;
+
 
 public function Fn1() returns (function (int, int) returns (int)) {
     return privateFunc1;

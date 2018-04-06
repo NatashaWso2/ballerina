@@ -1,4 +1,4 @@
-package structdef;
+
 
 public struct Person {
     string name;

@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.jwt.signature;
+
 
 @Description {value:"Verify the signature of a given jwt."}
 @Param {value:"data: Original data which has signed."}

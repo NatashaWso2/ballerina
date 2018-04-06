@@ -1,4 +1,4 @@
-package restfulservice.samples;
+
 
 import ballerina/lang.messages;
 import ballerina/lang.strings;

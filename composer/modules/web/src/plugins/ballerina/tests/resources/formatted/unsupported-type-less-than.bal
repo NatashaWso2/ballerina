@@ -1,4 +1,4 @@
-package lang.expressions.btype.unsupported.lt;
+
 
 function checkLessThanForUnsupportedType () (boolean) {
     json j1;

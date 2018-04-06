@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.metrics;
+
 
 @Description {value:"Counter metric, to track counts of events or running totals."}
 @Field {value:"name: The name of the counter. Required."}

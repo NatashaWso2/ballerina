@@ -1,4 +1,4 @@
-package ballerina.log;
+
 
 @Description {value: "Logs the specified value at DEBUG level."}
 @Param {value: "msg: The message to be logged"}

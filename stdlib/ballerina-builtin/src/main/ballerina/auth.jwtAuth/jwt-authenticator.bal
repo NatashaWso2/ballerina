@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.auth.jwtAuth;
+
 
 import ballerina/runtime;
 import ballerina/jwt;

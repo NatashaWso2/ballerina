@@ -1,4 +1,4 @@
-package org.foo.baz;
+
 
 public type ParentFoo {
     int i;

@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.task;
+
 
 @Description {value:"Schedules a timer task"}
 @Param {value:"onTrigger: The function which gets called when the timer goes off"}

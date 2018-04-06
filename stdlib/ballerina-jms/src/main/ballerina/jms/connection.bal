@@ -1,4 +1,4 @@
-package ballerina.jms;
+
 
 public type Connection object {
     public {

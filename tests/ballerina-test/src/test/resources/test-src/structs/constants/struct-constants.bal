@@ -1,4 +1,4 @@
-package constants;
+
 
 @final Person p = 10;
 

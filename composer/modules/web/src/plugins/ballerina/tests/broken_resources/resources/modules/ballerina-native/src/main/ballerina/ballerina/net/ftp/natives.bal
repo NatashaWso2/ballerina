@@ -1,4 +1,4 @@
-package ballerina.net.ftp;
+
 
 import ballerina/lang.files;
 import ballerina/doc;

@@ -1,4 +1,4 @@
-package ballerina.config;
+
 
 @Description { value:"Retrieve the specified global configuration value" }
 @Param { value:"property: The configuration to be retrieved" }

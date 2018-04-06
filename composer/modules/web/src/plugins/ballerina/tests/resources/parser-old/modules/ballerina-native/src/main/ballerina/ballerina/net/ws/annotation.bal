@@ -1,4 +1,4 @@
-package ballerina.http;
+
 
 annotation WebSocketUpgradePath attach service {
     string value;

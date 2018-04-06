@@ -1,4 +1,4 @@
-package lang.jsontype.pkg.structdef;
+
 
 struct Person {
     string name;

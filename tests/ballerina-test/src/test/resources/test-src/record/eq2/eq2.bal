@@ -1,4 +1,4 @@
-package eq2;
+
 
 public type employee {
     int age;

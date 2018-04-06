@@ -1,4 +1,4 @@
-package lang.expressions.btype.incompatible.eq;
+
 
 function checkEqulalityOfTwoTypes() (boolean){
 	int a;

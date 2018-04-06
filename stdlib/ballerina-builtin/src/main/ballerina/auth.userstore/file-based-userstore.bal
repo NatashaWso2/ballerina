@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.auth.userstore;
+
 
 import ballerina/config;
 import ballerina/security.crypto;

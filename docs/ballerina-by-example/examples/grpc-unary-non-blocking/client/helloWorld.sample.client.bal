@@ -1,5 +1,5 @@
 // This is client implementation for unary non blocking scenario
-package client;
+
 
 import ballerina/io;
 
