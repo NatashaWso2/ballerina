@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.http;
+
 
 documentation {
     SimpleClientEndpoint provides an HTTP endpoint with minimal configurations.

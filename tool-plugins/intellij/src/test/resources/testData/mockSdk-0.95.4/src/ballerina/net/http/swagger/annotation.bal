@@ -1,4 +1,4 @@
-package ballerina/swagger;
+
 
 import ballerina/http;
 

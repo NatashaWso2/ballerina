@@ -1,4 +1,4 @@
-package lang.annotations.foo;
+
 
 import lang.annotations.doc1 as doc;
 import ballerina/http;

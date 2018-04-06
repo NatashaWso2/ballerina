@@ -1,4 +1,4 @@
-package ballerina.lang.files;
+
 
 import ballerina/doc;
 

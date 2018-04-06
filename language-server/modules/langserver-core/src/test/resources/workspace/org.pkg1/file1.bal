@@ -1,4 +1,4 @@
-package org.pkg1;
+
 
 import ballerina/io;
 

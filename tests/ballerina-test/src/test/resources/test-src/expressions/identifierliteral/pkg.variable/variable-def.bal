@@ -1,4 +1,4 @@
-package pkg.variable;
+
 
 public int ^"Variable Int" = 800;
 public string ^"Variable String" = "value";

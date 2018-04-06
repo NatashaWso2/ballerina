@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.security.crypto;
+
 
 @Description {value:"The algorithms which can be used in crypto functions."}
 @Field {value:"MD5: MD5 algorithm"}

@@ -1,4 +1,4 @@
-package clientConnector.sample;
+
 
 import ballerina/net.ws;
 import ballerina/lang.system;

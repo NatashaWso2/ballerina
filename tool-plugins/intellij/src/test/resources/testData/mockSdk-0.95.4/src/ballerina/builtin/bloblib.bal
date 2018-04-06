@@ -1,4 +1,4 @@
-package ballerina.builtin;
+
 
 @Description { value:"Converts blob to a string"}
 @Param { value:"b: The blob value to be converted" }

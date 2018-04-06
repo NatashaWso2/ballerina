@@ -1,4 +1,4 @@
-package lang.expressions.btype.unsupported.eq;
+
 
 function checkEqulalityOfUnsupportedType() (boolean){
 	json j1;

@@ -1,4 +1,4 @@
-package initializers;
+
 
 public type employee{
     int age = 20;

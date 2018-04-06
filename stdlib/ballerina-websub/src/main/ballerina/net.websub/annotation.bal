@@ -1,4 +1,4 @@
-package ballerina.net.websub;
+
 
 ///////////////////////////
 /// Service Annotations ///

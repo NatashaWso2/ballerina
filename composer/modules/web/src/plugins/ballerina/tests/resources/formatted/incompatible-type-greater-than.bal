@@ -1,4 +1,4 @@
-package lang.expressions.btype.incompatible.gt;
+
 
 function checkGreaterThan () (boolean) {
     int a;

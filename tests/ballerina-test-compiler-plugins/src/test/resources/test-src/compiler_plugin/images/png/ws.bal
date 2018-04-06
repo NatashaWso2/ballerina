@@ -1,4 +1,4 @@
-package images.png;
+
 
 public annotation IConfig attach resource, function, action {
     string value;

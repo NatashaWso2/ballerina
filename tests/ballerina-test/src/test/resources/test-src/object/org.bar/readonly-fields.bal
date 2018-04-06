@@ -1,4 +1,4 @@
-package org.bar;
+
 
 @readonly public int globalInt = 10;
 

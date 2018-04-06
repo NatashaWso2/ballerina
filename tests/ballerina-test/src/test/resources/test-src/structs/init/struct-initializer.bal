@@ -1,4 +1,4 @@
-package init;
+
 
 import initializers as inp;
 

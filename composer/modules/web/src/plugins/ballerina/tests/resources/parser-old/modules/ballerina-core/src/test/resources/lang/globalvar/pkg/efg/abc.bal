@@ -1,4 +1,4 @@
-package lang.globalvar.pkg.efg;
+
 
 
 int successful = 200;

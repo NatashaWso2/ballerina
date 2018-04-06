@@ -1,4 +1,4 @@
-package lang.identifierliteral.pkg.variable;
+
 
 int |Variable Int| = 800;
 string |Variable String| = "value";

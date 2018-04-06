@@ -1,4 +1,4 @@
-package samples.parser;
+
 
 import ballerina/connectors.twitter;
 import ballerina/connectors.salesforce as sf;

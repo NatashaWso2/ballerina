@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.builtin;
+
 
 deprecated {}
 public annotation Description docData;

@@ -1,4 +1,4 @@
-package lang.expressions.btype.unsupported.gte;
+
 
 function checkGreaterThanEualForUnsupportedType() (boolean){
 	json j1;

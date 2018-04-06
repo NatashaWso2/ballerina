@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.auth;
+
 
 @Description {value:"Representation of Auth Config"}
 @Field {value:"authentication: Authentication struct instance"}

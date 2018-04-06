@@ -1,4 +1,4 @@
-package org.foo;
+
 
 public type userFoo object {
     public {

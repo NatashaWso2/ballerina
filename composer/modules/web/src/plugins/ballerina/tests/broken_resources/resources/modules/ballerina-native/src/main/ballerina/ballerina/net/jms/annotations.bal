@@ -1,4 +1,4 @@
-package ballerina.net.jms;
+
 
 annotation configuration attach service<> {
     string initialContextFactory;

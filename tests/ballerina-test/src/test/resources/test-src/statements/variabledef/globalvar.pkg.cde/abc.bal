@@ -1,4 +1,4 @@
-package globalvar.pkg.cde;
+
 
 import globalvar.pkg.efg;
 

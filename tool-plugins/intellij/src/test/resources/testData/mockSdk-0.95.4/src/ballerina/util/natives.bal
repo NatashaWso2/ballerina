@@ -1,4 +1,4 @@
-package ballerina.util;
+
 
 @Description {value:"Locale struct represents specific geographical, political, or cultural region."}
 @Field {value:"language: The language field for Locale"}

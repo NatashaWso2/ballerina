@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.http;
+
 
 @Description {value:"Mock service endpoint which does not open a listening port."}
 public type NonListeningServiceEndpoint object{

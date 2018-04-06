@@ -1,4 +1,4 @@
-package org.bar;
+
 
 @final public int globalBarInt = 100;
 

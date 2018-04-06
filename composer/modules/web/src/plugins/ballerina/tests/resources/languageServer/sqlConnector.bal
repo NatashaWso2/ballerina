@@ -1,4 +1,4 @@
-package servicechaining.samples;
+
 
 import ballerina/lang.messages;
 import ballerina/http;

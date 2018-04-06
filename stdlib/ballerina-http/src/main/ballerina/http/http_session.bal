@@ -1,4 +1,4 @@
-package ballerina.http;
+
 
 @Description { value:"Represents an HTTP Session"}
 public type Session object {

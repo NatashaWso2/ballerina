@@ -1,4 +1,4 @@
-package ballerina.file;
+
 
 import ballerina/io;
 

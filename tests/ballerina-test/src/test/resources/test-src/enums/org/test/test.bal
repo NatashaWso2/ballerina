@@ -1,5 +1,5 @@
 
-package org.test;
+
 
 public enum kind {
     PLUS,

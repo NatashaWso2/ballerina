@@ -1,4 +1,4 @@
-package functionmocktest.pkg;
+
 
 import functionmocktest2.pkg as sub1;
 

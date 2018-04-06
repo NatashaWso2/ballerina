@@ -1,4 +1,4 @@
-package com.test;
+
 
 function main (string[] args) {
     getGreetingMess<caret>age("Ballerina", "Hello");

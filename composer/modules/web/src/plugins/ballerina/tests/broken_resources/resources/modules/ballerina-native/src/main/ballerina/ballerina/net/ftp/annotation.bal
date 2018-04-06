@@ -1,4 +1,4 @@
-package ballerina.net.ftp;
+
 
 annotation configuration attach service<> {
     string dirURI;

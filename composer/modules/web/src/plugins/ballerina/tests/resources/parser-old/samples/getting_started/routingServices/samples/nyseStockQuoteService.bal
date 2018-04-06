@@ -1,4 +1,4 @@
-package routingServices.samples;
+
 
 import ballerina/lang.messages;
 import ballerina/http;

@@ -1,4 +1,4 @@
-package ballerina.http;
+
 
 annotation GET attach resource {
 }

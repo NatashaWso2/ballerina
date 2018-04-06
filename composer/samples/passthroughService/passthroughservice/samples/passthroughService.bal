@@ -1,4 +1,4 @@
-package passthroughservice.samples;
+
 
 import ballerina/http;
 

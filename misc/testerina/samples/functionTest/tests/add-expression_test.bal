@@ -1,4 +1,4 @@
-package functionTest;
+
 
 import ballerina/test;
 import ballerina/io;

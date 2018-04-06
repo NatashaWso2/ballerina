@@ -1,4 +1,4 @@
-package ballerina.test;
+
 import ballerina/reflect;
 
 const string assertFailureErrorCategory = "assert-failure";

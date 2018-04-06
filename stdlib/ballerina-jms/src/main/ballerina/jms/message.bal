@@ -1,4 +1,4 @@
-package ballerina.jms;
+
 
 public type Message object {
     @Description { value:"Gets text content of the JMS message"}

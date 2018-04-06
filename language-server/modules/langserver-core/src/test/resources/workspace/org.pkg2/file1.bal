@@ -1,4 +1,4 @@
-package org.pkg2;
+
 
 import org.pkg1;
 

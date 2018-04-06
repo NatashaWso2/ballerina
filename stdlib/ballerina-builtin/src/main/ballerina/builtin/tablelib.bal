@@ -14,7 +14,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package ballerina.builtin;
+
 
 @Description {value:"Releases the database connection."}
 @Param {value:"dt: The table object"}
