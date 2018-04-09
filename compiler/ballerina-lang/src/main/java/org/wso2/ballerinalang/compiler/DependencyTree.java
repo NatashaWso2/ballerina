@@ -1,10 +1,12 @@
 package org.wso2.ballerinalang.compiler;
 
+import org.ballerinalang.model.elements.PackageID;
 import org.wso2.ballerinalang.compiler.semantics.model.SymbolEnv;
 import org.wso2.ballerinalang.compiler.semantics.model.SymbolTable;
 import org.wso2.ballerinalang.compiler.tree.BLangImportPackage;
 import org.wso2.ballerinalang.compiler.tree.BLangPackage;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
+import org.wso2.ballerinalang.compiler.util.Names;
 
 import java.io.PrintStream;
 import java.util.Iterator;
@@ -34,7 +36,7 @@ public class DependencyTree {
     }
 
     public void listDependencyPackages(BLangPackage packageNode) {
-        outStream.println(packageNode.packageID.bvmAlias() + ":" + packageNode.packageID.version);
+        outStream.println(packageInfo(packageNode.packageID));
         outStream.println(DependencyTree.renderDependencyTree(packageNode, symbolTable, 0));
     }
     /**
@@ -66,7 +68,7 @@ public class DependencyTree {
                                                                 int depth) {
         List<StringBuilder> result = new LinkedList<>();
         if (depth > 0) {
-            result.add(new StringBuilder().append(packageNode.packageID.bvmAlias()));
+            result.add(new StringBuilder().append(packageInfo(packageNode.packageID)));
         }
         Iterator<BLangImportPackage> iterator = packageNode.getImports().iterator();
         while (iterator.hasNext()) {
@@ -108,5 +110,23 @@ public class DependencyTree {
         while (iterator.hasNext()) {
             result.add(iterator.next().insert(0, "    "));
         }
+    }
+
+    /**
+     * Get package info as a string.
+     * @param packageID packagID of the package
+     * @return package info as a string
+     */
+    public static String packageInfo(PackageID packageID) {
+        String orgName = "";
+        if (packageID.orgName != null && packageID.orgName != Names.ANON_ORG) {
+            orgName = packageID.orgName + "/";
+        }
+
+        if (packageID.version == Names.DEFAULT_VERSION || packageID.version.equals(Names.EMPTY)) {
+            return orgName + packageID.name.value;
+        }
+
+        return orgName + packageID.name + ":" + packageID.version;
     }
 }
