@@ -1,6 +1,6 @@
 package packaging.pull;
 
-import ballerina/file;
+import ballerina/internal;
 import ballerina/io;
 import ballerina/mime;
 import ballerina/http;
@@ -76,8 +76,8 @@ function pullPackage (string url, string dirPath, string pkgPath, string fileSep
                         string destArchivePath = destDirPath  + fileSeparator + archiveFileName;
 
                         if (!createDirectories(destDirPath)) {
-                            file:Path pkgArchivePath = new(destArchivePath);
-                            if (file:exists(pkgArchivePath)){  
+                            internal:Path pkgArchivePath = new(destArchivePath);
+                            if (internal:exists(pkgArchivePath)){
                                 return;                              
                             }        
                         }
@@ -249,9 +249,9 @@ documentation {
     R{{}} - `boolean` If the directories were created or not.
 }
 function createDirectories(string directoryPath) returns (boolean) {
-    file:Path dirPath = new(directoryPath);
-    if (!file:exists(dirPath)){
-        boolean directoryCreationStatus = check (file:createDirectory(dirPath));
+    internal:Path dirPath = new(directoryPath);
+    if (!internal:exists(dirPath)){
+        boolean directoryCreationStatus = check (internal:createDirectory(dirPath));
         return directoryCreationStatus;
     } else {
         return false;
