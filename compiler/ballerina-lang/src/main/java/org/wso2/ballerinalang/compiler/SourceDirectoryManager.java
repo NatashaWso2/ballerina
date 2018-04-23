@@ -25,7 +25,9 @@ import org.wso2.ballerinalang.compiler.util.CompilerContext;
 import org.wso2.ballerinalang.compiler.util.CompilerOptions;
 import org.wso2.ballerinalang.compiler.util.Name;
 import org.wso2.ballerinalang.compiler.util.Names;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -103,6 +105,10 @@ public class SourceDirectoryManager {
                     new Name(manifest.getVersion()));
         }
 
+        if (isBalFile(Paths.get(sourcePackage))) {
+            return new PackageID(sourcePackage);
+        }
+
         return null;
     }
 
@@ -136,5 +142,9 @@ public class SourceDirectoryManager {
     private Name getOrgName(Manifest manifest) {
         return manifest.getName() == null || manifest.getName().isEmpty() ?
                 Names.ANON_ORG : names.fromString(manifest.getName());
+    }
+
+    private boolean isBalFile(Path path) {
+        return !Files.isDirectory(path) && path.getFileName().toString().endsWith(ProjectDirConstants.BLANG_SOURCE_EXT);
     }
 }
