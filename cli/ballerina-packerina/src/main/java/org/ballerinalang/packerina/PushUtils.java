@@ -101,7 +101,7 @@ public class PushUtils {
         }
 
         if (installToRepo == null) {
-            String resourcePath = resolvePkgPathInRemoteRepo(packageID);
+            String resourcePath = resolvePkgPathInRemoteRepo(packageID, RepoUtils.getRemoteRepoURL());
             pushPackageToRemoteRepo(packageID, manifest, pkgPathFromPrjtDir, resourcePath);
 
         } else {
@@ -110,9 +110,11 @@ public class PushUtils {
                     throw new BLangCompilerException("Remote repository url provided to push the package is " +
                                                              "invalid");
                 }
-                pushPackageToRemoteRepo(packageID, manifest, pkgPathFromPrjtDir, installToRepo);
+                String resourcePath = resolvePkgPathInRemoteRepo(packageID, installToRepo);
+                pushPackageToRemoteRepo(packageID, manifest, pkgPathFromPrjtDir, resourcePath);
+            } else {
+                installToHomeRepo(packageID, pkgPathFromPrjtDir);
             }
-            installToHomeRepo(packageID, pkgPathFromPrjtDir);
         }
     }
 
@@ -144,8 +146,8 @@ public class PushUtils {
     /**
      * Push package to the remote repository specified.
      *
-     * @param packageID packageID of the package
-     * @param manifest manifest object
+     * @param packageID          packageID of the package
+     * @param manifest           manifest object
      * @param pkgPathFromPrjtDir package path from the project directory
      */
     private static void pushPackageToRemoteRepo(PackageID packageID, Manifest manifest, Path pkgPathFromPrjtDir,
@@ -278,10 +280,11 @@ public class PushUtils {
      * Get URI of the package from the remote repo.
      *
      * @param packageID packageID object
+     * @param remoteRepoURL remote repo URL
      * @return full URI path of the package relative to the remote repo
      */
-    private static String resolvePkgPathInRemoteRepo(PackageID packageID) {
-        Repo<URI> remoteRepo = new RemoteRepo(URI.create(RepoUtils.getRemoteRepoURL()));
+    private static String resolvePkgPathInRemoteRepo(PackageID packageID, String remoteRepoURL) {
+        Repo<URI> remoteRepo = new RemoteRepo(URI.create(remoteRepoURL));
         Patten patten = remoteRepo.calculate(packageID);
         if (patten == Patten.NULL) {
             throw new BLangCompilerException("Couldn't find package " + packageID.toString());
