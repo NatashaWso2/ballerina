@@ -36,7 +36,9 @@ import org.wso2.ballerinalang.util.RepoUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -99,39 +101,80 @@ public class PushUtils {
         }
 
         if (installToRepo == null) {
-            // Get access token
-            String accessToken = checkAccessToken();
-
-            // Read the Package.md file content from the artifact
-            String mdFileContent = getPackageMDFileContent(pkgPathFromPrjtDir.toString(), packageName);
-            if (mdFileContent == null) {
-                throw new BLangCompilerException("Cannot find Package.md file in the artifact");
-            }
-
-            String description = readSummary(mdFileContent);
-            String homepageURL = manifest.getHomepageURL();
-            String repositoryURL = manifest.getRepositoryURL();
-            String apiDocURL = manifest.getDocumentationURL();
-            String authors = String.join(",", manifest.getAuthors());
-            String keywords = String.join(",", manifest.getKeywords());
-            String license = manifest.getLicense();
-
-            // Push package to central
             String resourcePath = resolvePkgPathInRemoteRepo(packageID);
-            String msg = orgName + "/" + packageName + ":" + version + " [project repo -> central]";
-            Proxy proxy = RepoUtils.readSettings().getProxy();
-
-            executor.execute("packaging_push/packaging_push.balx", true, accessToken, mdFileContent,
-                             description, homepageURL, repositoryURL, apiDocURL, authors, keywords, license,
-                             resourcePath, pkgPathFromPrjtDir.toString(), msg, proxy.getHost(), proxy.getPort(),
-                             proxy.getUserName(), proxy.getPassword());
+            pushPackageToRemoteRepo(packageID, manifest, pkgPathFromPrjtDir, resourcePath);
 
         } else {
             if (!installToRepo.equals("home")) {
-                throw new BLangCompilerException("Unknown repository provided to push the package");
+                if (!isValid(installToRepo)) {
+                    throw new BLangCompilerException("Remote repository url provided to push the package is " +
+                                                             "invalid");
+                }
+                pushPackageToRemoteRepo(packageID, manifest, pkgPathFromPrjtDir, installToRepo);
             }
             installToHomeRepo(packageID, pkgPathFromPrjtDir);
         }
+    }
+
+    /**
+     * Validates if the url passed is valid.
+     *
+     * @param url url passed as a string
+     * @return true if the url is valid else false
+     */
+    private static boolean isValid(String url) {
+        HttpURLConnection connection = null;
+        try {
+            URL siteURL = new URL(url);
+            connection = (HttpURLConnection) siteURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+
+            int code = connection.getResponseCode();
+            return code == 200;
+        } catch (IOException e) {
+            return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
+    }
+
+    /**
+     * Push package to the remote repository specified.
+     *
+     * @param packageID packageID of the package
+     * @param manifest manifest object
+     * @param pkgPathFromPrjtDir package path from the project directory
+     */
+    private static void pushPackageToRemoteRepo(PackageID packageID, Manifest manifest, Path pkgPathFromPrjtDir,
+                                                String resourcePath) {
+        // Get access token
+        String accessToken = checkAccessToken();
+
+        // Read the Package.md file content from the artifact
+        String mdFileContent = getPackageMDFileContent(pkgPathFromPrjtDir.toString(), packageID.name.getValue());
+        if (mdFileContent == null) {
+            throw new BLangCompilerException("Cannot find Package.md file in the artifact");
+        }
+
+        String description = readSummary(mdFileContent);
+        String homepageURL = manifest.getHomepageURL();
+        String repositoryURL = manifest.getRepositoryURL();
+        String apiDocURL = manifest.getDocumentationURL();
+        String authors = String.join(",", manifest.getAuthors());
+        String keywords = String.join(",", manifest.getKeywords());
+        String license = manifest.getLicense();
+        Proxy proxy = RepoUtils.readSettings().getProxy();
+
+        // Push package to central
+        String msg = packageID.orgName.getValue() + "/" + packageID.name.getValue() + ":"
+                + packageID.version.getValue() + " [project repo -> central]";
+        executor.execute("packaging_push/packaging_push.balx", true, accessToken, mdFileContent,
+                         description, homepageURL, repositoryURL, apiDocURL, authors, keywords, license,
+                         resourcePath, pkgPathFromPrjtDir.toString(), msg, proxy.getHost(), proxy.getPort(),
+                         proxy.getUserName(), proxy.getPassword());
     }
 
     /**
@@ -200,7 +243,7 @@ public class PushUtils {
             return Files.getLastModifiedTime(path).toMillis();
         } catch (IOException ex) {
             throw new BLangCompilerException("Error occurred when reading file for token " +
-                                             SETTINGS_TOML_FILE_PATH.toString());
+                                                     SETTINGS_TOML_FILE_PATH.toString());
         }
     }
 

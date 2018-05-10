@@ -30,8 +30,11 @@ import org.wso2.ballerinalang.compiler.packaging.repo.Repo;
 import org.wso2.ballerinalang.compiler.util.Name;
 import org.wso2.ballerinalang.util.RepoUtils;
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +61,9 @@ public class PullCommand implements BLauncherCmd {
 
     @Parameter(names = "--debug", hidden = true)
     private String debugPort;
+
+    @Parameter(names = "--repository", hidden = true)
+    private String repository;
 
     @Override
     public void execute() {
@@ -103,7 +109,15 @@ public class PullCommand implements BLauncherCmd {
             version = "*";
         }
 
-        URI baseURI = URI.create(RepoUtils.getRemoteRepoURL());
+        String repositoryPath = RepoUtils.getRemoteRepoURL();
+        if (repository != null) {
+            if (!isValid(repositoryPath)) {
+                throw new BLangCompilerException("Remote repository url provided to search for packages is " +
+                                                         "invalid");
+            }
+            repositoryPath = repository;
+        }
+        URI baseURI = URI.create(repositoryPath);
         Repo remoteRepo = new RemoteRepo(baseURI);
 
         PackageID packageID = new PackageID(new Name(orgName), new Name(packageName), new Name(version));
@@ -117,6 +131,31 @@ public class PullCommand implements BLauncherCmd {
             outStream.println("couldn't find package " + patten);
         }
         Runtime.getRuntime().exit(0);
+    }
+
+    /**
+     * Validates if the url passed is valid.
+     *
+     * @param url url passed as a string
+     * @return true if the url is valid else false
+     */
+    private static boolean isValid(String url) {
+        HttpURLConnection connection = null;
+        try {
+            URL siteURL = new URL(url);
+            connection = (HttpURLConnection) siteURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+
+            int code = connection.getResponseCode();
+            return code == 200;
+        } catch (IOException e) {
+            return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 
     @Override

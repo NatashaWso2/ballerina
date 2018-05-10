@@ -50,6 +50,9 @@ public class SearchCommand implements BLauncherCmd {
     @Parameter(names = "--debug", hidden = true)
     private String debugPort;
 
+    @Parameter(names = "--repository", hidden = true)
+    private String repository;
+
     @Override
     public void execute() {
         if (helpFlag) {
@@ -71,7 +74,7 @@ public class SearchCommand implements BLauncherCmd {
         }
 
         String searchArgs = argList.get(0);
-        SearchUtils.searchInCentral(searchArgs);
+        SearchUtils.searchInCentral(searchArgs, repository);
         Runtime.getRuntime().exit(0);
     }
 

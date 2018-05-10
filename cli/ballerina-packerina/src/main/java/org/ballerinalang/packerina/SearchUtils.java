@@ -17,10 +17,15 @@
  */
 package org.ballerinalang.packerina;
 
+import org.ballerinalang.compiler.BLangCompilerException;
 import org.ballerinalang.spi.EmbeddedExecutor;
 import org.ballerinalang.toml.model.Proxy;
 import org.ballerinalang.util.EmbeddedExecutorProvider;
 import org.wso2.ballerinalang.util.RepoUtils;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  * This class provides util methods when searching for Ballerina packages in the central.
@@ -33,12 +38,46 @@ public class SearchUtils {
      * Search for packages in central.
      *
      * @param argument arguments passed
+     * @param repositoryPath remote repository URL provided
      */
-    public static void searchInCentral(String argument) {
+    public static void searchInCentral(String argument, String repositoryPath) {
         String query = "?q=" + argument;
-        EmbeddedExecutor executor = EmbeddedExecutorProvider.getInstance().getExecutor();
+        String resourcePath = RepoUtils.getRemoteRepoURL();
+        if (repositoryPath != null) {
+            if (!isValid(repositoryPath)) {
+                throw new BLangCompilerException("Remote repository url provided to search for packages is " +
+                                                         "invalid");
+            }
+            resourcePath = repositoryPath;
+        }
         Proxy proxy = RepoUtils.readSettings().getProxy();
-        executor.execute("packaging_search/packaging_search.balx", true, RepoUtils.getRemoteRepoURL(), query,
+        EmbeddedExecutor executor = EmbeddedExecutorProvider.getInstance().getExecutor();
+        executor.execute("packaging_search/packaging_search.balx", true, resourcePath, query,
                          proxy.getHost(), proxy.getPort(), proxy.getUserName(), proxy.getPassword());
+    }
+
+    /**
+     * Validates if the url passed is valid.
+     *
+     * @param url url passed as a string
+     * @return true if the url is valid else false
+     */
+    private static boolean isValid(String url) {
+        HttpURLConnection connection = null;
+        try {
+            URL siteURL = new URL(url);
+            connection = (HttpURLConnection) siteURL.openConnection();
+            connection.setRequestMethod("GET");
+            connection.connect();
+
+            int code = connection.getResponseCode();
+            return code == 200;
+        } catch (IOException e) {
+            return false;
+        } finally {
+            if (connection != null) {
+                connection.disconnect();
+            }
+        }
     }
 }
