@@ -37,6 +37,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import org.wso2.ballerinalang.compiler.FileSystemProjectDirectory;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 import org.wso2.transport.http.netty.message.HTTPCarbonMessage;
 
 import java.io.IOException;
@@ -74,8 +75,8 @@ public class HttpCachingClientTest {
     public void setup() throws IOException {
         String httpModuleSourcePath = HttpConstants.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         Path sourceRoot = Paths.get(httpModuleSourcePath, "META-INF", "ballerina");
-        if (Files.notExists(Paths.get(sourceRoot.toString(), ".ballerina"))) {
-            Files.createDirectory(Paths.get(sourceRoot.toString(), ".ballerina"));
+        if (Files.notExists(Paths.get(sourceRoot.toString(), ProjectDirConstants.MANIFEST_FILE_NAME))) {
+            Files.createFile(Paths.get(sourceRoot.toString(), ProjectDirConstants.MANIFEST_FILE_NAME));
         }
         compileResult = BCompileUtil.compile(sourceRoot.toString(), "http", CompilerPhase.CODE_GEN,
                                              new FileSystemProjectDirectory(sourceRoot));

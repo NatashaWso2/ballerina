@@ -71,7 +71,7 @@ public class PackagingPushTestCase extends IntegrationTestCase {
 
         createBallerinaToml();
 
-        Path generatedPackagePath = Paths.get(ProjectDirConstants.DOT_BALLERINA_DIR_NAME,
+        Path generatedPackagePath = Paths.get(ProjectDirConstants.TARGET_DIR_NAME,
                                               ProjectDirConstants.DOT_BALLERINA_REPO_DIR_NAME,
                                               "integrationtests",
                                               packageName,
@@ -88,7 +88,7 @@ public class PackagingPushTestCase extends IntegrationTestCase {
      * @throws IOException i/o exception when writing to file
      */
     private void createBallerinaToml() throws IOException {
-        Path ballerinaToml = projectPath.resolve("Ballerina.toml");
+        Path ballerinaToml = projectPath.resolve(ProjectDirConstants.MANIFEST_FILE_NAME);
         String ballerinaTomlContent = "[project]\n org-name = \"integrationtests\"\n version = \"1.0.0\"";
         Files.write(ballerinaToml, ballerinaTomlContent.getBytes(), StandardOpenOption.CREATE);
     }

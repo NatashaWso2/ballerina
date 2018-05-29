@@ -16,6 +16,8 @@
 
 package org.ballerinalang.swagger.utils;
 
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -35,10 +37,10 @@ public class CodegenUtils {
      */
     public static boolean isBallerinaProject(Path path) {
        boolean isProject = false;
-       Path cachePath = path.resolve(".ballerina");
+       Path manifestPath = path.resolve(ProjectDirConstants.MANIFEST_FILE_NAME);
 
-       // .ballerina cache path should exist in ballerina project directory
-       if (Files.exists(cachePath)) {
+       // Ballerina.toml should exist in ballerina project directory
+       if (Files.exists(manifestPath)) {
            isProject = true;
        }
 

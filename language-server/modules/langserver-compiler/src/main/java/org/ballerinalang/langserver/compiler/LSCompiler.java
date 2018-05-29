@@ -40,8 +40,6 @@ import org.wso2.ballerinalang.compiler.util.Name;
 import org.wso2.ballerinalang.compiler.util.Names;
 import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 import org.wso2.ballerinalang.compiler.util.diagnotic.BLangDiagnosticLog;
-import org.wso2.ballerinalang.util.RepoUtils;
-
 
 import java.io.File;
 import java.io.IOException;
@@ -351,20 +349,16 @@ public class LSCompiler {
      * @param parentDir current parent directory
      * @return {@link String} project root | null
      */
-    public static String findProjectRoot(String parentDir) {
-        return findProjectRoot(parentDir, RepoUtils.createAndGetHomeReposPath());
-    }
-
     @CheckForNull
-    public static String findProjectRoot(String parentDir, Path homePath) {
-        Path path = Paths.get(parentDir, ProjectDirConstants.DOT_BALLERINA_DIR_NAME);
-        if (!path.equals(homePath) && java.nio.file.Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+    public static String findProjectRoot(String parentDir) {
+        Path path = Paths.get(parentDir, ProjectDirConstants.MANIFEST_FILE_NAME);
+        if (java.nio.file.Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
             return parentDir;
         }
         Path parent = Paths.get(parentDir);
         Path parentsParent = parent.getParent();
         if (null != parentsParent) {
-            return findProjectRoot(parentsParent.toString(), homePath);
+            return findProjectRoot(parentsParent.toString());
         }
         return null;
     }

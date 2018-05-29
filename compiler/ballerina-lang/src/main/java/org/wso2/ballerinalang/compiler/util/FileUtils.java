@@ -57,7 +57,7 @@ public class FileUtils {
      */
     static void generateBalo(BLangPackage bLangPackage, String projectPath, Stream<Path> paths) {
         PackageID packageID = bLangPackage.packageID;
-        Path destPath = Paths.get(projectPath, ProjectDirConstants.DOT_BALLERINA_DIR_NAME,
+        Path destPath = Paths.get(projectPath, ProjectDirConstants.TARGET_DIR_NAME,
                                   ProjectDirConstants.CACHES_DIR_NAME,
                                   ProjectDirConstants.BALLERINA_CENTRAL_DIR_NAME,
                                   packageID.getOrgName().getValue(),

@@ -22,6 +22,7 @@ import org.ballerinalang.compiler.CompilerPhase;
 import org.wso2.ballerinalang.compiler.Compiler;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
 import org.wso2.ballerinalang.compiler.util.CompilerOptions;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,7 +40,7 @@ public class GenerateBalo {
 
     public static void main(String[] args) throws IOException {
         String sourceRoot = args[0];
-        Files.createDirectories(Paths.get(sourceRoot).resolve(".ballerina"));
+        Files.createFile(Paths.get(sourceRoot).resolve(ProjectDirConstants.MANIFEST_FILE_NAME));
 
         CompilerContext context = new CompilerContext();
         CompilerOptions options = CompilerOptions.getInstance(context);

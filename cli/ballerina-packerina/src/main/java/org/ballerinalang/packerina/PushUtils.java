@@ -92,7 +92,7 @@ public class PushUtils {
         PackageID packageID = new PackageID(new Name(orgName), new Name(packageName), new Name(version));
 
         // Get package path from project directory path
-        Path pkgPathFromPrjtDir = Paths.get(prjDirPath.toString(), ProjectDirConstants.DOT_BALLERINA_DIR_NAME,
+        Path pkgPathFromPrjtDir = Paths.get(prjDirPath.toString(), ProjectDirConstants.TARGET_DIR_NAME,
                                             ProjectDirConstants.DOT_BALLERINA_REPO_DIR_NAME, orgName,
                                             packageName, version, packageName + ".zip");
         if (Files.notExists(pkgPathFromPrjtDir)) {

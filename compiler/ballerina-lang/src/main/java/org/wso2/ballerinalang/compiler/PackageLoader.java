@@ -139,14 +139,15 @@ public class PackageLoader {
 
     private RepoHierarchy genRepoHierarchy(Path sourceRoot) {
         Path balHomeDir = RepoUtils.createAndGetHomeReposPath();
-        Path projectHiddenDir = sourceRoot.resolve(".ballerina");
+        Path projectHiddenDir = sourceRoot.resolve(ProjectDirConstants.TARGET_DIR_NAME);
+        Path ballerinaHiddenDir = sourceRoot.resolve(ProjectDirConstants.DOT_BALLERINA_DIR_NAME);
         RepoHierarchyBuilder.RepoNode[] systemArr = loadSystemRepos();
         Converter<Path> converter = sourceDirectory.getConverter();
 
         Repo remote = new RemoteRepo(URI.create(RepoUtils.getRemoteRepoURL()));
         Repo homeCacheRepo = new CacheRepo(balHomeDir, ProjectDirConstants.BALLERINA_CENTRAL_DIR_NAME);
         Repo homeRepo = shouldReadBalo ? new BinaryRepo(balHomeDir) : new ZipRepo(balHomeDir);
-        Repo projectCacheRepo = new CacheRepo(projectHiddenDir, ProjectDirConstants.BALLERINA_CENTRAL_DIR_NAME);
+        Repo projectCacheRepo = new CacheRepo(ballerinaHiddenDir, ProjectDirConstants.BALLERINA_CENTRAL_DIR_NAME);
         Repo projectRepo = shouldReadBalo ? new BinaryRepo(projectHiddenDir) : new ZipRepo(projectHiddenDir);
 
 

@@ -51,8 +51,6 @@ public class BallerinaModuleBuilder extends JavaModuleBuilder implements SourceP
 
     // Note - Removing this override will create src directory in the project root.
     public List<Pair<String, String>> getSourcePaths() {
-        String ballerinaCacheRoot = getContentEntryPath() + File.separator + ".ballerina";
-        new File(ballerinaCacheRoot).mkdirs();
         String ballerinaTomlFile = getContentEntryPath() + File.separator + "Ballerina.toml";
         File file = new File(ballerinaTomlFile);
         try {

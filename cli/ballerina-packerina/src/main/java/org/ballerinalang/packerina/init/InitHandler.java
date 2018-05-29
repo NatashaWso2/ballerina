@@ -21,6 +21,7 @@ package org.ballerinalang.packerina.init;
 import org.ballerinalang.packerina.init.models.PackageMdFile;
 import org.ballerinalang.packerina.init.models.SrcFile;
 import org.ballerinalang.toml.model.Manifest;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -49,7 +50,7 @@ public class InitHandler {
     public static void initialize(Path projectPath, Manifest manifest, List<SrcFile> srcFiles,
                                   List<PackageMdFile> packageMdFile) throws IOException {
         createBallerinaToml(projectPath, manifest);
-        createBallerinaCacheFile(projectPath);
+        // createBallerinaCacheFile(projectPath);
         createPackageMd(projectPath, packageMdFile);
         createSrcFolder(projectPath, srcFiles);
 
@@ -66,7 +67,7 @@ public class InitHandler {
      */
     private static void createBallerinaToml(Path projectPath, Manifest manifest) throws IOException {
         if (null != manifest) {
-            Path tomlPath = Paths.get(projectPath.toString() + File.separator + "Ballerina.toml");
+            Path tomlPath = Paths.get(projectPath.toString() + File.separator + ProjectDirConstants.MANIFEST_FILE_NAME);
             if (!Files.exists(tomlPath)) {
                 // Creating main function file.
                 Files.createFile(tomlPath);
@@ -100,22 +101,6 @@ public class InitHandler {
                 }
             }
         }
-    }
-
-    /**
-     * Create the .ballerina/ cache folder.
-     *
-     * @param projectPath The output path.
-     * @throws IOException If file write exception occurs.
-     */
-    private static void createBallerinaCacheFile(Path projectPath) throws IOException {
-        Path cacheFolder = Paths.get(projectPath.toString() + File.separator + ".ballerina");
-        if (!Files.exists(cacheFolder)) {
-            // Creating main function file.
-            Files.createDirectory(cacheFolder);
-        }
-        String ignoreFileContent = "*\n!.gitignore\n";
-        createIgnoreFiles(cacheFolder, ignoreFileContent);
     }
 
     /**

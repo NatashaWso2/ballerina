@@ -71,7 +71,7 @@ public class ListCommand implements BLauncherCmd {
             // ballerina list
             ListUtils.list(sourceRootPath);
         } else {
-            if (Files.exists(sourceRootPath.resolve(ProjectDirConstants.DOT_BALLERINA_DIR_NAME))) {
+            if (Files.exists(sourceRootPath.resolve(ProjectDirConstants.MANIFEST_FILE_NAME))) {
                 String pkgName = argList.get(0);
                 ListUtils.list(sourceRootPath, pkgName);
             } else {

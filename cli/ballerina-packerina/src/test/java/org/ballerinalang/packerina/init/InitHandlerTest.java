@@ -28,6 +28,7 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -71,7 +72,7 @@ public class InitHandlerTest {
 
         InitHandler.initialize(tmpDir, manifest, srcFiles, packageMdFiles);
     
-        Path tomlFile = tmpDir.resolve("Ballerina.toml");
+        Path tomlFile = tmpDir.resolve(ProjectDirConstants.MANIFEST_FILE_NAME);
         byte[] tomlFileBytes = Files.readAllBytes(tomlFile);
     
         String tomlFileContents = new String(tomlFileBytes, Charset.defaultCharset());

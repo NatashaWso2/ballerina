@@ -26,6 +26,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -44,9 +45,9 @@ public class TesterinaSamplesTest {
     @BeforeClass
     public void setUserDir() throws IOException {
         testerinaRoot = System.getProperty("user.dir") + "/../../samples";
-        Path filePath = Paths.get(testerinaRoot + "/.ballerina");
+        Path filePath = Paths.get(testerinaRoot, ProjectDirConstants.MANIFEST_FILE_NAME);
         Utils.cleanUpDir(filePath);
-        Files.createDirectory(filePath);
+        Files.createFile(filePath);
     }
 
     // /samples/functionTest
@@ -85,7 +86,7 @@ public class TesterinaSamplesTest {
 
     @AfterClass
     public void cleanDirectory() throws IOException {
-        Utils.cleanUpDir(Paths.get(testerinaRoot,  ".ballerina"));
+        Utils.cleanUpDir(Paths.get(testerinaRoot,  ProjectDirConstants.MANIFEST_FILE_NAME));
     }
 
 }

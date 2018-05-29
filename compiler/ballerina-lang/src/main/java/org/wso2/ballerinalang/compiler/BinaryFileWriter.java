@@ -42,8 +42,8 @@ import java.util.ServiceLoader;
 import static org.wso2.ballerinalang.compiler.util.ProjectDirConstants.BLANG_COMPILED_PKG_EXT;
 import static org.wso2.ballerinalang.compiler.util.ProjectDirConstants.BLANG_COMPILED_PROG_EXT;
 import static org.wso2.ballerinalang.compiler.util.ProjectDirConstants.BLANG_SOURCE_EXT;
-import static org.wso2.ballerinalang.compiler.util.ProjectDirConstants.DOT_BALLERINA_DIR_NAME;
 import static org.wso2.ballerinalang.compiler.util.ProjectDirConstants.DOT_BALLERINA_REPO_DIR_NAME;
+import static org.wso2.ballerinalang.compiler.util.ProjectDirConstants.TARGET_DIR_NAME;
 
 /**
  * Write a compiled executable program(.balx) or a compiled package(balo.) to a file.
@@ -173,7 +173,7 @@ public class BinaryFileWriter {
     }
 
     private Path getPackageDirPathInProjectRepo(PackageID pkgId) {
-        Path relativePkgPath = Paths.get(DOT_BALLERINA_DIR_NAME, DOT_BALLERINA_REPO_DIR_NAME,
+        Path relativePkgPath = Paths.get(TARGET_DIR_NAME, DOT_BALLERINA_REPO_DIR_NAME,
                 pkgId.getOrgName().getValue(), pkgId.getName().getValue(), pkgId.getPackageVersion().getValue());
         return this.sourceDirectory.getPath().resolve(relativePkgPath);
     }

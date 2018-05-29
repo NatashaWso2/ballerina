@@ -86,7 +86,7 @@ public class InitCommand implements BLauncherCmd {
             if (interactiveFlag) {
 
                 // Check if Ballerina.toml file needs to be created.
-                out.print("Create Ballerina.toml [yes/y, no/n]: (n) ");
+                out.print("Create Ballerina.toml [yes/y, no/n]: (y) ");
                 String createToml = scanner.nextLine().trim();
 
                 if (createToml.equalsIgnoreCase("yes") || createToml.equalsIgnoreCase("y")) {

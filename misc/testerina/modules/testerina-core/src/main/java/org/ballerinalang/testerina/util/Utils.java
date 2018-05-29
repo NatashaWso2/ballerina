@@ -70,7 +70,11 @@ public class Utils {
     public static void cleanUpDir(Path path) {
         try {
             if (Files.exists(path)) {
-                Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+                if (Files.isRegularFile(path)) {
+                    Files.delete(path);
+                } else {
+                    Files.walk(path).sorted(Comparator.reverseOrder()).map(Path::toFile).forEach(File::delete);
+                }
             }
         } catch (IOException e) {
             errStream.println("Error occurred while deleting the dir : " + path.toString() + " with error : "

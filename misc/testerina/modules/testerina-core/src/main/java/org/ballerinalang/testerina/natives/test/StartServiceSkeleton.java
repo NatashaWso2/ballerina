@@ -39,6 +39,7 @@ import org.ballerinalang.testerina.util.Utils;
 import org.ballerinalang.util.codegen.ProgramFile;
 import org.ballerinalang.util.diagnostic.Diagnostic;
 import org.ballerinalang.util.exceptions.BallerinaException;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -105,14 +106,15 @@ public class StartServiceSkeleton extends BlockingNativeCallableUnit {
     }
 
     private void initTempDir(String sourceRoot) {
-        // create the .testerina directory and .ballerina directory
-        Path projectRoot = Paths.get(sourceRoot, TesterinaConstants.TESTERINA_TEMP_DIR, ".ballerina");
+        // create the .testerina directory and Ballerina.toml
+        Path projectRoot = Paths.get(sourceRoot, TesterinaConstants.TESTERINA_TEMP_DIR);
         if (!Files.exists(projectRoot)) {
             try {
                 Files.createDirectories(projectRoot);
+                Files.createFile(projectRoot.resolve(Paths.get(ProjectDirConstants.MANIFEST_FILE_NAME)));
             } catch (IOException e) {
                 throw new BallerinaIOException(String.format("Service skeleton creation failed. Failed to create " +
-                               "[.ballerina] %s [cause] %s", projectRoot.toString(), e.getMessage()), e);
+                               "[Ballerina.toml] %s [cause] %s", projectRoot.toString(), e.getMessage()), e);
             }
         }
     }

@@ -58,9 +58,8 @@ public class RepoUtils {
      * @return true if the directory is a project repo, false if its the home repo
      */
     public static boolean hasProjectRepo(Path path) {
-        path = path.resolve(ProjectDirConstants.DOT_BALLERINA_DIR_NAME);
-        return !path.equals(createAndGetHomeReposPath()) && Files.exists(path, LinkOption.NOFOLLOW_LINKS) &&
-                Files.isDirectory(path);
+        path = path.resolve(ProjectDirConstants.MANIFEST_FILE_NAME);
+        return Files.exists(path, LinkOption.NOFOLLOW_LINKS);
     }
 
     /**

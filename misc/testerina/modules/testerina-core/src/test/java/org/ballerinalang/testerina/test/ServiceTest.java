@@ -25,6 +25,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,9 +43,9 @@ public class ServiceTest {
 
     @BeforeClass
     public void createDir() throws IOException {
-        Path filePath = Paths.get(sourceRoot + "/.ballerina");
+        Path filePath = Paths.get(sourceRoot, ProjectDirConstants.MANIFEST_FILE_NAME);
         Files.deleteIfExists(filePath);
-        Files.createDirectory(filePath);
+        Files.createFile(filePath);
     }
 
     @BeforeClass
@@ -72,7 +73,7 @@ public class ServiceTest {
 
     @AfterClass
     public void cleanDirectory() throws IOException {
-        Utils.cleanUpDir(Paths.get(sourceRoot + "/.ballerina"));
+        Utils.cleanUpDir(Paths.get(sourceRoot, ProjectDirConstants.MANIFEST_FILE_NAME));
     }
 
 }

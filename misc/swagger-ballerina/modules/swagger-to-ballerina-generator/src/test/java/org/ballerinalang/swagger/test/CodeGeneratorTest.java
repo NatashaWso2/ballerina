@@ -22,6 +22,7 @@ import org.ballerinalang.swagger.utils.GeneratorConstants.GenType;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,9 +51,9 @@ public class CodeGeneratorTest {
         Path outFile = projectPath.resolve(Paths.get(pkgName, "gen", "swagger_petstore.bal"));
 
         try {
-            Path cachePath = projectPath.resolve(Paths.get(".ballerina"));
-            if (Files.notExists(cachePath)) {
-                Files.createDirectory(cachePath);
+            Path manifestPath = projectPath.resolve(Paths.get(ProjectDirConstants.MANIFEST_FILE_NAME));
+            if (Files.notExists(manifestPath)) {
+                Files.createFile(manifestPath);
             }
 
             generator.generate(GenType.MOCK, definitionPath, projectPath.toString());
@@ -78,9 +79,9 @@ public class CodeGeneratorTest {
         Path outFile = projectPath.resolve(Paths.get(pkgName, "gen", "swagger_petstore.bal"));
 
         try {
-            Path cachePath = projectPath.resolve(Paths.get(".ballerina"));
-            if (Files.notExists(cachePath)) {
-                Files.createDirectory(cachePath);
+            Path manifestPath = projectPath.resolve(Paths.get(ProjectDirConstants.MANIFEST_FILE_NAME));
+            if (Files.notExists(manifestPath)) {
+                Files.createFile(manifestPath);
             }
 
             generator.generate(GenType.CLIENT, definitionPath, projectPath.toString());
