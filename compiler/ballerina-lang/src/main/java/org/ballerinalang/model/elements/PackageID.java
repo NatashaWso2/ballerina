@@ -135,7 +135,7 @@ public class PackageID {
             orgName = this.orgName + "/";
         }
 
-        if (version == Names.DEFAULT_VERSION || version.equals(Names.EMPTY)) {
+        if (version.equals(Names.DEFAULT_VERSION) || version.equals(Names.EMPTY)) {
             return orgName + this.name.value;
         }
 
