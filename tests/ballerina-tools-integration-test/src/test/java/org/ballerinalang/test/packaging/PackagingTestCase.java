@@ -40,16 +40,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Testing pushing a package to central.
+ * Testing pushing, pulling, searching a package to central and installing it to the home repository.
  */
-public class PackagingPushTestCase extends IntegrationTestCase {
+public class PackagingTestCase extends IntegrationTestCase {
     private ServerInstance ballerinaClient;
     private String serverZipPath;
     private Path tempHomeDirectory;
@@ -169,7 +171,7 @@ public class PackagingPushTestCase extends IntegrationTestCase {
         compressFiles(tempDir, projectPath.resolve(generatedPackagePath).resolve(packageName + ".zip"));
     }
 
-    @Test(description = "Test pushing a package to central")
+    @Test(description = "Test pushing a package to central", priority = 1)
     public void testPush() throws Exception {
         ballerinaClient = new ServerInstance(serverZipPath);
         String sourceRootPath = projectPath.toString();
@@ -187,10 +189,10 @@ public class PackagingPushTestCase extends IntegrationTestCase {
         HttpResponse response = HttpClientRequest.doGet(stagingURL + "integrationtests/" + packageName
                                                                 + "/1.0.0");
         Assert.assertEquals(response.getResponseCode(), 200, "Response code mismatched");
-
+        ballerinaClient.stopServer();
     }
 
-    @Test(description = "Test pushing a package to the home repository (installing a package)")
+    @Test(description = "Test pushing a package to the home repository (installing a package)", priority = 2)
     public void testInstall() throws Exception {
         ballerinaClient = new ServerInstance(serverZipPath);
         String sourceRootPath = projectPath.toString();
@@ -202,6 +204,44 @@ public class PackagingPushTestCase extends IntegrationTestCase {
                                  packageName, "1.0.0");
         Assert.assertTrue(Files.exists(tempHomeDirectory.resolve(dirPath)));
         Assert.assertTrue(Files.exists(tempHomeDirectory.resolve(dirPath).resolve(packageName + ".zip")));
+        ballerinaClient.stopServer();
+    }
+
+    @Test(description = "Test searching a package from central", priority = 3)
+    public void testSearch() throws Exception {
+        ballerinaClient = new ServerInstance(serverZipPath);
+        String[] clientArgs = {packageName};
+        Date date = new Date();
+        String modifiedDate = new SimpleDateFormat("yyyy-MM-dd").format(date);
+        String loggedMsg = "\n" +
+                "Ballerina Central\n" +
+                "=================\n" +
+                "\n" +
+                "|NAME                                                  | DESCRIPTION                             " +
+                "                                          | AUTHOR         | DATE           | VERSION |\n" +
+                "|------------------------------------------------------| ----------------------------------------" +
+                "------------------------------------------| ---------------| ---------------| --------|\n" +
+                "|integrationtests/" + packageName + "                             | Allows connecting Test REST API" +
+                "                                       |                | " + modifiedDate + " | 1.0.0   |\n" +
+                "\n";
+        LogLeecher clientLeecher = new LogLeecher(loggedMsg);
+        ballerinaClient.addLogLeecher(clientLeecher);
+        ballerinaClient.runMain(clientArgs, getEnvVariables(), "search");
+        clientLeecher.waitForText(5000);
+        ballerinaClient.stopServer();
+    }
+
+    @Test(description = "Test pulling a package from central", priority = 4)
+    public void testPull() throws Exception {
+        Thread.sleep(10000);
+        ballerinaClient = new ServerInstance(serverZipPath);
+        String[] clientArgs = {"integrationtests/" + packageName + ":1.0.0"};
+        ballerinaClient.runMain(clientArgs, getEnvVariables(), "pull");
+        Path dirPath = Paths.get(ProjectDirConstants.CACHES_DIR_NAME,
+                                 ProjectDirConstants.BALLERINA_CENTRAL_DIR_NAME,
+                                 "integrationtests", packageName, "1.0.0");
+        Assert.assertTrue(Files.exists(tempHomeDirectory.resolve(dirPath).resolve(packageName + ".zip")));
+        ballerinaClient.stopServer();
     }
 
     /**
@@ -240,7 +280,6 @@ public class PackagingPushTestCase extends IntegrationTestCase {
 
     @AfterClass
     private void cleanup() throws Exception {
-        ballerinaClient.stopServer();
         deleteFiles(tempHomeDirectory);
         deleteFiles(tempProjectDirectory);
     }
