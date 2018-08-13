@@ -52,6 +52,7 @@ import org.wso2.ballerinalang.compiler.tree.BLangTypeDefinition;
 import org.wso2.ballerinalang.compiler.tree.BLangVariable;
 import org.wso2.ballerinalang.compiler.tree.BLangWorker;
 import org.wso2.ballerinalang.compiler.tree.BLangXMLNS;
+import org.wso2.ballerinalang.compiler.tree.TestableBLangPackage;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangAnnotAttachmentAttribute;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangAnnotAttachmentAttributeValue;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangArrayLiteral;
@@ -226,6 +227,24 @@ public class CodeAnalyzer extends BLangNodeVisitor {
         }
         parent = pkgNode;
         SymbolEnv pkgEnv = symTable.pkgEnvMap.get(pkgNode.symbol);
+        analyze(pkgNode, pkgEnv);
+
+        if (pkgNode.testableBLangPackage != null) {
+            visit(pkgNode.testableBLangPackage);
+        }
+    }
+
+    public void visit(TestableBLangPackage pkgNode) {
+        if (pkgNode.completedPhases.contains(CompilerPhase.CODE_ANALYZE)) {
+            return;
+        }
+        parent = pkgNode;
+        SymbolEnv enclosingPkgEnv = this.symTable.pkgEnvMap.get(pkgNode.symbol);
+        SymbolEnv pkgEnv = SymbolEnv.createPkgEnv(pkgNode, pkgNode.symbol.scope, enclosingPkgEnv);
+        analyze(pkgNode, pkgEnv);
+    }
+
+    private void analyze(BLangPackage pkgNode, SymbolEnv pkgEnv) {
         pkgNode.topLevelNodes.forEach(topLevelNode -> analyzeNode((BLangNode) topLevelNode, pkgEnv));
         pkgNode.completedPhases.add(CompilerPhase.CODE_ANALYZE);
         parent = null;

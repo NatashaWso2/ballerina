@@ -72,6 +72,7 @@ import org.wso2.ballerinalang.compiler.tree.BLangWorker;
 import org.wso2.ballerinalang.compiler.tree.BLangXMLNS;
 import org.wso2.ballerinalang.compiler.tree.BLangXMLNS.BLangLocalXMLNS;
 import org.wso2.ballerinalang.compiler.tree.BLangXMLNS.BLangPackageXMLNS;
+import org.wso2.ballerinalang.compiler.tree.TestableBLangPackage;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangAnnotAttachmentAttribute;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangAnnotAttachmentAttributeValue;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangArrayLiteral;
@@ -356,6 +357,27 @@ public class CodeGenerator extends BLangNodeVisitor {
 
         // Generate code for the given package.
         this.currentPkgInfo = new PackageInfo();
+        genNode(pkgNode);
+
+        // Generate for Testable package
+        if (pkgNode.testableBLangPackage != null) {
+            generateBALO(pkgNode.testableBLangPackage);
+        }
+        this.currentPkgInfo = null;
+        return pkgNode;
+    }
+
+    public BLangPackage generateBALO(TestableBLangPackage pkgNode) {
+        // Generate code for the given package.
+        PackageInfo enclPkgInfo = this.currentPkgInfo;
+        enclPkgInfo.copyTo(this.currentPkgInfo);
+        genNode(pkgNode);
+
+        this.currentPkgInfo = null;
+        return pkgNode;
+    }
+
+    private void genNode(BLangPackage pkgNode) {
         genNode(pkgNode, this.symTable.pkgEnvMap.get(pkgNode.symbol));
 
         // Add global variable indexes to the ProgramFile
@@ -365,8 +387,6 @@ public class CodeGenerator extends BLangNodeVisitor {
 
         pkgNode.symbol.packageFile = new PackageFile(getPackageBinaryContent(pkgNode));
         setEntryPoints(pkgNode.symbol.packageFile, pkgNode);
-        this.currentPkgInfo = null;
-        return pkgNode;
     }
 
     private void setEntryPoints(CompiledBinaryFile compiledBinaryFile, BLangPackage pkgNode) {
@@ -433,10 +453,12 @@ public class CodeGenerator extends BLangNodeVisitor {
         pkgNode.services.forEach(this::createServiceInfoEntry);
         pkgNode.functions.forEach(this::createFunctionInfoEntry);
 
-        // Visit package builtin function
-        visitBuiltinFunctions(pkgNode.initFunction);
-        visitBuiltinFunctions(pkgNode.startFunction);
-        visitBuiltinFunctions(pkgNode.stopFunction);
+        if (!(pkgNode instanceof TestableBLangPackage)) {
+            // Visit package builtin function
+            visitBuiltinFunctions(pkgNode.initFunction);
+            visitBuiltinFunctions(pkgNode.startFunction);
+            visitBuiltinFunctions(pkgNode.stopFunction);
+        }
 
         pkgNode.topLevelNodes.stream()
                 .filter(pkgLevelNode -> pkgLevelNode.getKind() != NodeKind.VARIABLE &&
