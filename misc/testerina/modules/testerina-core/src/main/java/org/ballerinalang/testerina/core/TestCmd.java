@@ -35,10 +35,13 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.LogManager;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.ballerinalang.runtime.Constants.SYSTEM_PROP_BAL_DEBUG;
 
@@ -104,7 +107,12 @@ public class TestCmd implements BLauncherCmd {
         SourceDirectory srcDirectory = null;
         if (sourceFileList == null || sourceFileList.isEmpty()) {
             srcDirectory = new FileSystemProjectDirectory(sourceRootPath);
-            sourceFileList = srcDirectory.getSourcePackageNames();
+            List<String> pkgList = srcDirectory.getSourcePackageNames();
+
+            sourceFileList = Stream.of(pkgList, new FileSystemProjectDirectory(sourceRootPath).getSourceFileNames())
+                                         .flatMap(Collection::stream)
+                                         .collect(Collectors.toList());
+
         } else if (sourceFileList.get(0).endsWith(BLangConstants.BLANG_SRC_FILE_SUFFIX)) {
             Path sourceFilePath = Paths.get(sourceFileList.get(0));
             if (sourceFilePath.isAbsolute()) {

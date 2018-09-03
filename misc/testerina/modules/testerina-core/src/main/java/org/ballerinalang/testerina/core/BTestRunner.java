@@ -32,6 +32,7 @@ import org.ballerinalang.testerina.core.entity.TestSuite;
 import org.ballerinalang.testerina.core.entity.TesterinaReport;
 import org.ballerinalang.testerina.core.entity.TesterinaResult;
 import org.ballerinalang.testerina.util.TesterinaUtils;
+import org.ballerinalang.util.BLangConstants;
 import org.ballerinalang.util.codegen.ProgramFile;
 import org.ballerinalang.util.debugger.Debugger;
 import org.ballerinalang.util.diagnostic.Diagnostic;
@@ -154,7 +155,7 @@ public class BTestRunner {
             return;
         }
         Arrays.stream(sourceFilePaths).forEach(sourcePackage -> {
-            getTestSuiteForPkg(sourcePackage.toString());
+            String packageName = getTestSuiteForPkg(sourcePackage.toString());
             // compile
             CompileResult compileResult = BCompileUtil.compileWithTests(sourceRoot, sourcePackage.toString(),
                 CompilerPhase.CODE_GEN);
@@ -168,7 +169,7 @@ public class BTestRunner {
             }
             // set the debugger
             ProgramFile programFile = compileResult.getProgFile();
-            processProgramFile(programFile);
+            processProgramFile(programFile, packageName);
         });
         registry.setTestSuitesCompiled(true);
     }
@@ -178,14 +179,15 @@ public class BTestRunner {
      *
      * @param sourcePackage source package name
      */
-    private void getTestSuiteForPkg(String sourcePackage) {
-        String packageName = TesterinaUtils.getFullPackageName(sourcePackage);
-
-        registry.getTestSuites().computeIfAbsent(packageName, func -> new TestSuite(packageName));
-
-        if (packageName.equals(Names.DEFAULT_PACKAGE.value)) {
-            registry.getTestSuites().get(packageName).setSourceFileName(sourcePackage);
+    private String getTestSuiteForPkg(String sourcePackage) {
+        String packageName;
+        if (sourcePackage.endsWith(BLangConstants.BLANG_SRC_FILE_SUFFIX)) {
+            packageName = sourcePackage;
+        } else {
+            packageName = TesterinaUtils.getFullPackageName(sourcePackage);
         }
+        registry.getTestSuites().computeIfAbsent(packageName, func -> new TestSuite(packageName));
+        return packageName;
     }
 
     /**
@@ -199,16 +201,16 @@ public class BTestRunner {
             return;
         }
         packageList.forEach((sourcePackage, compiledBinaryFile) -> {
-            String packageName = TesterinaUtils.getFullPackageName(sourcePackage.packageID.getName().getValue());
+            String packageName;
+            if (sourcePackage.packageID.getName().equals(Names.DEFAULT_PACKAGE)) {
+                packageName = sourcePackage.packageID.sourceFileName.value;
+            } else {
+                packageName = TesterinaUtils.getFullPackageName(sourcePackage.packageID.getName().getValue());
+            }
 
             registry.getTestSuites().computeIfAbsent(packageName, func -> new TestSuite(packageName));
-
-            if (packageName.equals(Names.DEFAULT_PACKAGE.value)) {
-                registry.getTestSuites().get(packageName)
-                        .setSourceFileName(sourcePackage.packageID.sourceFileName.toString());
-            }
             ProgramFile pFile = LauncherUtils.getExecutableProgram(compiledBinaryFile);
-            processProgramFile(pFile);
+            processProgramFile(pFile, packageName);
         });
         registry.setTestSuitesCompiled(true);
     }
@@ -217,8 +219,9 @@ public class BTestRunner {
      * Process the program file i.e. the executable program generated.
      *
      * @param programFile program file generated
+     * @param sourcePackage
      */
-    private void processProgramFile(ProgramFile programFile) {
+    private void processProgramFile(ProgramFile programFile, String sourcePackage) {
         // set the debugger
         Debugger debugger = new Debugger(programFile);
         TesterinaUtils.initDebugger(programFile, debugger);
@@ -229,7 +232,7 @@ public class BTestRunner {
         processorServiceLoader.forEach(plugin -> {
             if (plugin instanceof TestAnnotationProcessor) {
                 try {
-                    ((TestAnnotationProcessor) plugin).packageProcessed(programFile);
+                    ((TestAnnotationProcessor) plugin).packageProcessed(programFile, sourcePackage);
                 } catch (Exception e) {
                     errStream.println("error: validation failed. Cause: " + e.getMessage());
                     throw new BallerinaException(e);

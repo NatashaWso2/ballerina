@@ -38,6 +38,7 @@ import org.wso2.ballerinalang.compiler.tree.BLangFunction;
 import org.wso2.ballerinalang.compiler.tree.BLangPackage;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangArrayLiteral;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangRecordLiteral;
+import org.wso2.ballerinalang.compiler.util.Names;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -231,13 +232,13 @@ public class TestAnnotationProcessor extends AbstractCompilerPlugin {
      *
      * @param programFile {@link ProgramFile} corresponds to the current ballerina package
      */
-    public void packageProcessed(ProgramFile programFile) {
+    public void packageProcessed(ProgramFile programFile, String sourcePackage) {
         if (!enabled) {
             return;
         }
         //packageInit = false;
         // TODO the below line is required since this method is currently getting explicitly called from BTestRunner
-        suite = TesterinaRegistry.getInstance().getTestSuites().get(programFile.getEntryPkgName());
+        suite = TesterinaRegistry.getInstance().getTestSuites().get(sourcePackage);
         if (suite == null) {
             throw new BallerinaException("No test suite found for [package]: " + programFile.getEntryPkgName());
         }
@@ -535,6 +536,9 @@ public class TestAnnotationProcessor extends AbstractCompilerPlugin {
 
     private String getPackageName(PackageNode packageNode) {
         BLangPackage bLangPackage = ((BLangPackage) packageNode);
+        if (bLangPackage.packageID.name.equals(Names.DEFAULT_PACKAGE)) {
+            return bLangPackage.packageID.sourceFileName.toString();
+        }
         return bLangPackage.packageID.toString();
     }
 }

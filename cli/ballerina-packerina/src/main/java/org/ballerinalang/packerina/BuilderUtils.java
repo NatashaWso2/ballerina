@@ -24,7 +24,6 @@ import org.wso2.ballerinalang.compiler.ListenerRegistry;
 import org.wso2.ballerinalang.compiler.tree.BLangPackage;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
 import org.wso2.ballerinalang.compiler.util.CompilerOptions;
-import org.wso2.ballerinalang.compiler.util.Names;
 import org.wso2.ballerinalang.programfile.CompiledBinaryFile;
 
 import java.nio.file.Path;
@@ -101,18 +100,15 @@ public class BuilderUtils {
     private static void runTests(Compiler compiler, Path sourceRootPath, List<BLangPackage> packageList) {
         Map<BLangPackage, CompiledBinaryFile.ProgramFile> packageProgramFileMap = new HashMap<>();
         packageList.forEach(bLangPackage -> {
-            // We only execute the tests in packages so single bal files are ignored
-            if (!bLangPackage.packageID.getName().equals(Names.DOT)) {
-                CompiledBinaryFile.ProgramFile programFile;
-                if (bLangPackage.testablePackage != null) {
-                    programFile = compiler.getExecutableProgram(bLangPackage.testablePackage);
-                } else {
-                    // In this package there are no tests to be executed. So we need to say to the users that there are
-                    // no tests found in the package to be executed
-                    programFile = compiler.getExecutableProgram(bLangPackage);
-                }
-                packageProgramFileMap.put(bLangPackage, programFile);
+            CompiledBinaryFile.ProgramFile programFile;
+            if (bLangPackage.testablePackage != null) {
+                programFile = compiler.getExecutableProgram(bLangPackage.testablePackage);
+            } else {
+                // In this package there are no tests to be executed. So we need to say to the users that there are
+                // no tests found in the package to be executed
+                programFile = compiler.getExecutableProgram(bLangPackage);
             }
+            packageProgramFileMap.put(bLangPackage, programFile);
         });
         if (packageProgramFileMap.size() > 0) {
             TesterinaUtils.executeTests(sourceRootPath, packageProgramFileMap);

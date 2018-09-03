@@ -40,18 +40,18 @@ public class DependsOnTest {
     public void tesDependsOnFunctions() {
         BTestRunner runner = new BTestRunner();
         runner.runTest(sourceRoot, new Path[]{Paths.get("depends-on.bal")}, new ArrayList<>());
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "skipped"), 0);
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "passed"), 4);
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "failed"), 0);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("depends-on.bal", "skipped"), 0);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("depends-on.bal", "passed"), 4);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("depends-on.bal", "failed"), 0);
     }
 
     @Test
     public void tesDependsOnFunctionsWithBefore() {
         BTestRunner runner = new BTestRunner();
         runner.runTest(sourceRoot, new Path[]{Paths.get("depends-on-with-before.bal")}, new ArrayList<>());
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "skipped"), 0);
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "passed"), 4);
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "failed"), 0);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("depends-on-with-before.bal", "skipped"), 0);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("depends-on-with-before.bal", "passed"), 4);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("depends-on-with-before.bal", "failed"), 0);
     }
 
     @Test(expectedExceptions = BallerinaException.class,

@@ -41,9 +41,9 @@ public class DisableFunctionsTest {
     public void disableFunctionsTest() {
         BTestRunner testRunner = new BTestRunner();
         testRunner.runTest(sourceRoot, filePaths, new ArrayList<>());
-        Assert.assertEquals(testRunner.getTesterinaReport().getTestSummary(".", "passed"), 2);
+        Assert.assertEquals(testRunner.getTesterinaReport().getTestSummary("disable-test.bal", "passed"), 2);
         // disabled tests shouldn't count as skipped
-        Assert.assertEquals(testRunner.getTesterinaReport().getTestSummary(".", "skipped"), 0);
+        Assert.assertEquals(testRunner.getTesterinaReport().getTestSummary("disable-test.bal", "skipped"), 0);
     }
 
     @AfterMethod

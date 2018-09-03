@@ -41,9 +41,9 @@ public class BeforeAfterTest {
         BTestRunner runner = new BTestRunner();
         runner.runTest(sourceRoot, new Path[]{Paths.get("before-after-func.bal")}, new
             ArrayList<>());
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "skipped"), 0);
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "passed"), 2);
-        Assert.assertEquals(runner.getTesterinaReport().getTestSummary(".", "failed"), 0);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("before-after-func.bal", "skipped"), 0);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("before-after-func.bal", "passed"), 2);
+        Assert.assertEquals(runner.getTesterinaReport().getTestSummary("before-after-func.bal", "failed"), 0);
     }
 
     @Test(expectedExceptions = BallerinaException.class,
