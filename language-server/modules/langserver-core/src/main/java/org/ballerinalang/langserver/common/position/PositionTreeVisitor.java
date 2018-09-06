@@ -116,8 +116,8 @@ public class PositionTreeVisitor extends LSNodeVisitor {
     }
 
     public void visit(BLangPackage pkgNode) {
-        // Then visit each top-level element sorted using the compilation unit
-        List<TopLevelNode> topLevelNodes = pkgNode.topLevelNodes.stream()
+        BLangPackage resolvingPkg = CommonUtil.isTestSource(context, pkgNode) ? pkgNode.testablePackage : pkgNode;
+        List<TopLevelNode> topLevelNodes = resolvingPkg.topLevelNodes.stream()
                 .filter(node ->
                                 node.getPosition().getSource()
                                         .getCompilationUnitName()

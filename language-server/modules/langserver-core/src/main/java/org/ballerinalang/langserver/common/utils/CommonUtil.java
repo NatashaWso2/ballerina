@@ -802,6 +802,20 @@ public class CommonUtil {
     }
 
     /**
+     * Check whether the given source is a test source.
+     *
+     * @param context           LangServer Context
+     * @param bLangPackage      Current BLangPackage
+     * @return {@link Boolean}  Whether a test source or not
+     */
+    public static boolean isTestSource(LSContext context, BLangPackage bLangPackage) {
+        String file = context.get(DocumentServiceKeys.FILE_NAME_KEY);
+        return bLangPackage.testablePackage != null &&
+                bLangPackage.testablePackage.compUnits.stream()
+                        .filter(compilationUnit -> compilationUnit.getName().equals(file)).findFirst().isPresent();
+    }
+
+    /**
      * Inner class for generating function code.
      */
     public static class FunctionGenerator {

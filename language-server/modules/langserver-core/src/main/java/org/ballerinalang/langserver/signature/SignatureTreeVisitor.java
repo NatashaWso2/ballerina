@@ -85,7 +85,8 @@ public class SignatureTreeVisitor extends LSNodeVisitor {
         SymbolEnv pkgEnv = symTable.pkgEnvMap.get(pkgNode.symbol);
         // Then visit each top-level element sorted using the compilation unit
         String fileName = lsContext.get(DocumentServiceKeys.FILE_NAME_KEY);
-        BLangCompilationUnit compilationUnit = pkgNode.getCompilationUnits().stream()
+        BLangPackage resolvingPkg = CommonUtil.isTestSource(lsContext, pkgNode) ? pkgNode.testablePackage : pkgNode;
+        BLangCompilationUnit compilationUnit = resolvingPkg.getCompilationUnits().stream()
                 .filter(bLangCompilationUnit -> bLangCompilationUnit.getName().equals(fileName))
                 .findFirst().orElse(new BLangCompilationUnit());
         List<TopLevelNode> topLevelNodes = compilationUnit.getTopLevelNodes();

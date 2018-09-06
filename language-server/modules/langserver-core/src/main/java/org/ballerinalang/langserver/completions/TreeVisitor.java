@@ -159,12 +159,14 @@ public class TreeVisitor extends LSNodeVisitor {
     public void visit(BLangPackage pkgNode) {
         SymbolEnv pkgEnv = this.symTable.pkgEnvMap.get(pkgNode.symbol);
         this.symbolEnv = pkgEnv;
+        BLangPackage resolvingPackage = CommonUtil.isTestSource(this.lsContext, pkgNode) ?
+                pkgNode.testablePackage : pkgNode;
 
-        List<TopLevelNode> topLevelNodes = pkgNode.topLevelNodes.stream()
+        List<TopLevelNode> topLevelNodes = resolvingPackage.topLevelNodes.stream()
                 .filter(filterNodeByCompilationUnit(lsContext.get(DocumentServiceKeys.FILE_NAME_KEY)))
                 .collect(Collectors.toList());
 
-        List<BLangImportPackage> imports = pkgNode.getImports().stream()
+        List<BLangImportPackage> imports = resolvingPackage.getImports().stream()
                 .filter(filterNodeByCompilationUnit(lsContext.get(DocumentServiceKeys.FILE_NAME_KEY)))
                 .collect(Collectors.toList());
         
