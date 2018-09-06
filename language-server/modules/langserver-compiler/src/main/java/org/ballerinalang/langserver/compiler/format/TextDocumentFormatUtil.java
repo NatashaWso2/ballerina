@@ -75,10 +75,10 @@ public class TextDocumentFormatUtil {
     /**
      * Get the AST for the current text document's content.
      *
-     * @param uri             File path as a URI
-     * @param lsCompiler
-     * @param documentManager Workspace document manager instance
-     * @param context         Document formatting context
+     * @param uri               File path as a URI
+     * @param lsCompiler        LSCompiler instance
+     * @param documentManager   Workspace document manager instance
+     * @param context           Document formatting context
      * @return {@link JsonObject}   AST as a Json Object
      */
     public static JsonObject getAST(String uri, LSCompiler lsCompiler,
@@ -98,8 +98,9 @@ public class TextDocumentFormatUtil {
         JsonElement diagnosticsJson = gson.toJsonTree(diagnostics);
         result.add("diagnostics", diagnosticsJson);
 
-        BLangCompilationUnit compilationUnit = bLangPackage.getCompilationUnits().stream().
-                filter(compUnit -> fileName.equals(compUnit.getName())).findFirst().orElseGet(null);
+        BLangPackage resolvingPkg = isTestSource(bLangPackage, fileName) ? bLangPackage.testablePackage : bLangPackage;
+        BLangCompilationUnit compilationUnit = resolvingPkg.getCompilationUnits().stream().
+                filter(compUnit -> fileName.equals(compUnit.getName())).findFirst().orElse(null);
         JsonElement modelElement = generateJSON(compilationUnit, new HashMap<>());
         result.add("model", modelElement);
 
@@ -304,5 +305,18 @@ public class TextDocumentFormatUtil {
             return jsonElements;
         }
         return null;
+    }
+
+    /**
+     * Check whether the given source is a test source.
+     *
+     * @param bLangPackage      Current BLangPackage
+     * @param fileName          File name
+     * @return {@link Boolean}  Whether a test source or not
+     */
+    private static boolean isTestSource(BLangPackage bLangPackage, String fileName) {
+        return bLangPackage.testablePackage != null &&
+                bLangPackage.testablePackage.compUnits.stream()
+                        .filter(compilationUnit -> compilationUnit.getName().equals(fileName)).findFirst().isPresent();
     }
 }

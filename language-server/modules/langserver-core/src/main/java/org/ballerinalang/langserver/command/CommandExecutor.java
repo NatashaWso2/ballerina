@@ -62,6 +62,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.ballerinalang.langserver.common.utils.CommonUtil.createVariableDeclaration;
+import static org.ballerinalang.langserver.common.utils.CommonUtil.isTestSource;
 import static org.ballerinalang.langserver.compiler.LSCompilerUtil.getUntitledFilePath;
 
 /**
@@ -153,10 +154,12 @@ public class CommandExecutor {
                         bLangPackage.symbol.getName().getValue());
             String pkgName = context.get(ExecuteCommandKeys.PKG_NAME_KEY);
             String currentFile = context.get(DocumentServiceKeys.FILE_NAME_KEY);
+            BLangPackage resolvingPkg = isTestSource(context, bLangPackage) ?
+                    bLangPackage.testablePackage : bLangPackage;
             DiagnosticPos pos;
 
             // Filter the imports except the runtime import
-            List<BLangImportPackage> imports = bLangPackage.getImports().stream()
+            List<BLangImportPackage> imports = resolvingPkg.getImports().stream()
                     .filter(bLangImportPackage -> bLangImportPackage.getPosition().src.cUnitName.equals(currentFile))
                     .collect(Collectors.toList());
 
@@ -208,18 +211,26 @@ public class CommandExecutor {
         for (Object arg : context.get(ExecuteCommandKeys.COMMAND_ARGUMENTS_KEY)) {
             String argKey = ((LinkedTreeMap) arg).get(ARG_KEY).toString();
             String argVal = ((LinkedTreeMap) arg).get(ARG_VALUE).toString();
-            if (argKey.equals(CommandConstants.ARG_KEY_DOC_URI)) {
-                documentUri = argVal;
-                textDocumentIdentifier.setUri(documentUri);
-                context.put(DocumentServiceKeys.FILE_URI_KEY, documentUri);
-            } else if (argKey.equals(CommandConstants.ARG_KEY_FUNC_NAME)) {
-                funcName = argVal;
-            } else if (argKey.equals(CommandConstants.ARG_KEY_RETURN_TYPE)) {
-                returnType = argVal;
-            } else if (argKey.equals(CommandConstants.ARG_KEY_RETURN_DEFAULT_VAL)) {
-                returnDefaultValue = argVal;
-            } else if (argKey.equals(CommandConstants.ARG_KEY_FUNC_ARGS)) {
-                funcArgs = argVal;
+            switch (argKey) {
+                case CommandConstants.ARG_KEY_DOC_URI:
+                    documentUri = argVal;
+                    textDocumentIdentifier.setUri(documentUri);
+                    context.put(DocumentServiceKeys.FILE_URI_KEY, documentUri);
+                    break;
+                case CommandConstants.ARG_KEY_FUNC_NAME:
+                    funcName = argVal;
+                    break;
+                case CommandConstants.ARG_KEY_RETURN_TYPE:
+                    returnType = argVal;
+                    break;
+                case CommandConstants.ARG_KEY_RETURN_DEFAULT_VAL:
+                    returnDefaultValue = argVal;
+                    break;
+                case CommandConstants.ARG_KEY_FUNC_ARGS:
+                    funcArgs = argVal;
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -325,9 +336,11 @@ public class CommandExecutor {
         WorkspaceDocumentManager documentManager = context.get(ExecuteCommandKeys.DOCUMENT_MANAGER_KEY);
         BLangPackage bLangPackage = lsCompiler.getBLangPackage(context, documentManager,
                 false, LSCustomErrorStrategy.class, false).getRight();
+        BLangPackage resolvingPackage = CommonUtil.isTestSource(context, bLangPackage)
+                ? bLangPackage.testablePackage : bLangPackage;
         context.put(DocumentServiceKeys.CURRENT_BLANG_PACKAGE_CONTEXT_KEY, bLangPackage);
         CommandUtil.DocAttachmentInfo docAttachmentInfo =
-                getDocumentEditForNodeByPosition(topLevelNodeType, bLangPackage, line, context);
+                getDocumentEditForNodeByPosition(topLevelNodeType, resolvingPackage, line, context);
 
         if (docAttachmentInfo != null) {
             Path filePath = Paths.get(URI.create(documentUri));
@@ -369,6 +382,8 @@ public class CommandExecutor {
         BLangPackage bLangPackage = lsCompiler.getBLangPackage(context,
                 context.get(ExecuteCommandKeys.DOCUMENT_MANAGER_KEY), false, LSCustomErrorStrategy.class, false)
                 .getRight();
+        BLangPackage resolvingPackage = CommonUtil.isTestSource(context, bLangPackage) ?
+                bLangPackage.testablePackage : bLangPackage;
 
         Path filePath = Paths.get(URI.create(documentUri));
         Path compilationPath = getUntitledFilePath(filePath.toString()).orElse(filePath);
@@ -376,7 +391,7 @@ public class CommandExecutor {
         String[] contentComponents = fileContent.split(CommonUtil.LINE_SEPARATOR_SPLIT);
         List<TextEdit> textEdits = new ArrayList<>();
         String fileName = context.get(DocumentServiceKeys.FILE_NAME_KEY);
-        bLangPackage.topLevelNodes.stream()
+        resolvingPackage.topLevelNodes.stream()
                 .filter(node -> node.getPosition().getSource().getCompilationUnitName().equals(fileName))
                 .forEach(topLevelNode -> {
                     CommandUtil.DocAttachmentInfo docAttachmentInfo = getDocumentEditForNode(topLevelNode);

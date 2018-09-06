@@ -18,6 +18,7 @@ package org.ballerinalang.langserver.definition;
 
 import org.ballerinalang.langserver.common.LSNodeVisitor;
 import org.ballerinalang.langserver.common.constants.NodeContextKeys;
+import org.ballerinalang.langserver.common.utils.CommonUtil;
 import org.ballerinalang.langserver.compiler.DocumentServiceKeys;
 import org.ballerinalang.langserver.compiler.LSServiceOperationContext;
 import org.ballerinalang.model.tree.TopLevelNode;
@@ -75,7 +76,8 @@ public class DefinitionTreeVisitor extends LSNodeVisitor {
     @Override
     public void visit(BLangPackage pkgNode) {
         // Then visit each top-level element sorted using the compilation unit
-        List<TopLevelNode> topLevelNodes = pkgNode.topLevelNodes.stream().filter(node ->
+        BLangPackage resolvingPackage = CommonUtil.isTestSource(context, pkgNode) ? pkgNode.testablePackage : pkgNode;
+        List<TopLevelNode> topLevelNodes = resolvingPackage.topLevelNodes.stream().filter(node ->
                 node.getPosition().getSource().getCompilationUnitName().equals(this.fileName)
         ).collect(Collectors.toList());
 

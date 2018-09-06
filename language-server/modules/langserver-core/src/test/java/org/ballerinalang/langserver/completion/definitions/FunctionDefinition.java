@@ -78,6 +78,7 @@ public class FunctionDefinition extends CompletionTest {
                 {"completionWithinCatch.json", "function"},
                 {"completionWithinTransaction.json", "function"},
                 {"completionWithinTransactionOnRetry.json", "function"},
+                {"completionWithinTestSource.json", "function"},
         };
     }
 }
