@@ -33,7 +33,8 @@ import static org.wso2.ballerinalang.compiler.semantics.model.symbols.SymTag.PAC
  */
 public class BPackageSymbol extends BTypeSymbol {
 
-    public BInvokableSymbol initFunctionSymbol, startFunctionSymbol, stopFunctionSymbol;
+    public BInvokableSymbol initFunctionSymbol, startFunctionSymbol, stopFunctionSymbol, testInitFunctionSymbol,
+            testStartFunctionSymbol, testStopFunctionSymbol;
     public List<BPackageSymbol> imports = new ArrayList<>();
     public PackageFile packageFile;
     public CompiledPackage compiledPackage;
@@ -76,6 +77,9 @@ public class BPackageSymbol extends BTypeSymbol {
         copy.initFunctionSymbol = initFunctionSymbol;
         copy.startFunctionSymbol = startFunctionSymbol;
         copy.stopFunctionSymbol = stopFunctionSymbol;
+        copy.testInitFunctionSymbol = testInitFunctionSymbol;
+        copy.testStartFunctionSymbol = testStartFunctionSymbol;
+        copy.testStopFunctionSymbol = testStopFunctionSymbol;
         copy.packageFile = packageFile;
         copy.compiledPackage = compiledPackage;
         copy.entryPointExists = entryPointExists;
