@@ -22,16 +22,16 @@ import org.ballerinalang.testerina.core.BTestRunner;
 import org.ballerinalang.testerina.core.TesterinaConstants;
 import org.ballerinalang.testerina.core.TesterinaRegistry;
 import org.ballerinalang.toml.model.Manifest;
-import org.ballerinalang.toml.parser.ManifestProcessor;
+import org.ballerinalang.util.BLangConstants;
 import org.ballerinalang.util.codegen.PackageInfo;
 import org.ballerinalang.util.codegen.ProgramFile;
 import org.ballerinalang.util.debugger.Debugger;
 import org.ballerinalang.util.exceptions.BallerinaException;
 import org.ballerinalang.util.program.BLangFunctions;
-import org.wso2.ballerinalang.compiler.tree.BLangPackage;
+import org.wso2.ballerinalang.compiler.FileSystemProjectDirectory;
+import org.wso2.ballerinalang.compiler.SourceDirectory;
 import org.wso2.ballerinalang.compiler.util.Names;
-import org.wso2.ballerinalang.compiler.util.ProjectDirConstants;
-import org.wso2.ballerinalang.programfile.CompiledBinaryFile;
+import org.wso2.ballerinalang.util.TomlParserUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,15 +43,15 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Utility methods.
  */
-public class TesterinaUtils {
+public class Utils {
 
     private static PrintStream errStream = System.err;
     private static TesterinaRegistry registry = TesterinaRegistry.getInstance();
+    private static PrintStream outStream = System.out;
 
     public static void startService(ProgramFile programFile) {
         if (!programFile.isServiceEPAvailable()) {
@@ -135,7 +135,7 @@ public class TesterinaUtils {
      * Set manifest configurations.
      */
     public static void setManifestConfigs() {
-        Manifest manifest = readManifestConfigurations();
+        Manifest manifest = TomlParserUtils.getManifest(Paths.get(System.getProperty("user.dir")));
         String orgName = manifest.getName();
         String version = manifest.getVersion();
         TesterinaRegistry.getInstance().setOrgName(orgName);
@@ -143,43 +143,34 @@ public class TesterinaUtils {
     }
 
     /**
-     * Read the manifest.
-     *
-     * @return manifest configuration object
-     */
-    private static Manifest readManifestConfigurations() {
-        String tomlFilePath = Paths.get(".").toAbsolutePath().normalize().resolve
-                (ProjectDirConstants.MANIFEST_FILE_NAME).toString();
-        try {
-            return ManifestProcessor.parseTomlContentFromFile(tomlFilePath);
-        } catch (IOException e) {
-            return new Manifest();
-        }
-    }
-
-    /**
-     * Execute tests in build.
+     * Include tests into the build command.
      *
      * @param sourceRootPath source root path
-     * @param programFileMap map containing bLangPackage nodes along with their compiled program files
+     * @param sourceFileList file list
      */
-    public static void executeTests(Path sourceRootPath, Map<BLangPackage, CompiledBinaryFile.ProgramFile>
-            programFileMap) {
-        // Load configuration file. The default config file is taken "ballerina.conf" in the source root path
+    public static void testWithBuild(Path sourceRootPath, List<String> sourceFileList) {
+        SourceDirectory srcDirectory;
+        if (sourceFileList == null || sourceFileList.isEmpty()) {
+            srcDirectory = new FileSystemProjectDirectory(sourceRootPath);
+            sourceFileList = srcDirectory.getSourcePackageNames();
+        } else if (sourceFileList.get(0).endsWith(BLangConstants.BLANG_SRC_FILE_SUFFIX)) {
+            outStream.println();
+            return;
+        }
+
         LauncherUtils.loadConfigurations(sourceRootPath, new HashMap<>(), null, false);
 
-        // Set org-name and version to the TesterinaRegistry
-        setManifestConfigs();
+        Path[] paths = sourceFileList.stream().map(Paths::get).toArray(Path[]::new);
+        Utils.setManifestConfigs();
 
         BTestRunner testRunner = new BTestRunner();
-        // Run the tests
-        testRunner.runTest(programFileMap);
+        testRunner.runTest(sourceRootPath.toString(), paths, null, true, true);
 
         if (testRunner.getTesterinaReport().isFailure()) {
-            cleanUpDir(sourceRootPath.resolve(TesterinaConstants.TESTERINA_TEMP_DIR));
+            Utils.cleanUpDir(sourceRootPath.resolve(TesterinaConstants.TESTERINA_TEMP_DIR));
             Runtime.getRuntime().exit(1);
         }
-        cleanUpDir(sourceRootPath.resolve(TesterinaConstants.TESTERINA_TEMP_DIR));
+        Utils.cleanUpDir(sourceRootPath.resolve(TesterinaConstants.TESTERINA_TEMP_DIR));
     }
 
     /**
