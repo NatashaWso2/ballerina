@@ -24,6 +24,7 @@ import org.ballerinalang.model.types.BStructureType;
 import org.ballerinalang.model.types.BTableType;
 import org.ballerinalang.model.types.BType;
 import org.ballerinalang.model.types.BTypes;
+import org.ballerinalang.util.TableIterator;
 import org.ballerinalang.util.TableProvider;
 import org.ballerinalang.util.TableUtils;
 import org.ballerinalang.util.exceptions.BallerinaException;
@@ -153,6 +154,10 @@ public class BTable implements BRefType<Object>, BCollection {
            reset(isInTransaction);
         }
         return hasNextVal;
+    }
+
+    public int length() {
+        return tableProvider.getRowCount(tableName);
     }
 
     public void moveToNext() {

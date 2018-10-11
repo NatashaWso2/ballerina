@@ -37,3 +37,8 @@ public extern function map::clear();
 #
 # + return - An any array of values contained in the specified map
 public extern function map::values() returns (any[]);
+
+# Returns the number of key-value mappings in the specified map.
+#
+# + return - The number of key-value mappings in the specified map
+public extern function map::length() returns (int);

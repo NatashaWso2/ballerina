@@ -70,3 +70,8 @@ type TableConfig record {
     any[] data;
     !...
 };
+
+# Returns the number of rows of the specified table.
+#
+# + return - The number of rows of the specified table
+public extern function table::length() returns int;

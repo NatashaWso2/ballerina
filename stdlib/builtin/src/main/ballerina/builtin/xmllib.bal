@@ -112,3 +112,8 @@ public extern function xml::appendChildren(xml children);
 #
 # + qname - Namespace qualified name of the children to be removed
 public extern function xml::removeChildren(string qname);
+
+# Returns the number of content items in the specified XML value
+#
+# + return - The number of content items in the specified XML value
+public extern function xml::length() returns int;
