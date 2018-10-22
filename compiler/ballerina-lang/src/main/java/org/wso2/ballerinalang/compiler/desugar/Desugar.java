@@ -20,6 +20,7 @@ package org.wso2.ballerinalang.compiler.desugar;
 import org.ballerinalang.compiler.CompilerPhase;
 import org.ballerinalang.model.TreeBuilder;
 import org.ballerinalang.model.elements.Flag;
+import org.ballerinalang.model.elements.PackageID;
 import org.ballerinalang.model.elements.TableColumnFlag;
 import org.ballerinalang.model.tree.NodeKind;
 import org.ballerinalang.model.tree.OperatorKind;
@@ -168,6 +169,7 @@ import org.wso2.ballerinalang.compiler.tree.types.BLangObjectTypeNode;
 import org.wso2.ballerinalang.compiler.tree.types.BLangRecordTypeNode;
 import org.wso2.ballerinalang.compiler.tree.types.BLangValueType;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
+import org.wso2.ballerinalang.compiler.util.Constants;
 import org.wso2.ballerinalang.compiler.util.Name;
 import org.wso2.ballerinalang.compiler.util.Names;
 import org.wso2.ballerinalang.compiler.util.TypeTags;
@@ -1153,6 +1155,11 @@ public class Desugar extends BLangNodeVisitor {
             return;
         }
 
+        if (iExpr.builtinLengthOperationInvocation) {
+            visitBuiltinFunctionInvocation(iExpr);
+            return;
+        }
+
         // Reorder the arguments to match the original function signature.
         reorderArguments(iExpr);
         iExpr.requiredArgs = rewriteExprs(iExpr.requiredArgs);
@@ -1905,6 +1912,31 @@ public class Desugar extends BLangNodeVisitor {
                 epSymbol.getClientFunction, Collections.emptyList(), symResolver);
         getClientExpr.expr = iExpr.expr;
         iExpr.expr = getClientExpr;
+    }
+
+    /**
+     * Visit builtin function invocations.
+     * @param iExpr invocation expression
+     */
+    private void visitBuiltinFunctionInvocation(BLangInvocation iExpr) {
+        // Check if the builtin operation is 'length'.
+        if (Constants.BUILTIN_LENGTH_OPERATION.equals(iExpr.name.value)) {
+            DiagnosticPos pos = iExpr.pos;
+            final BLangUnaryExpr lengthExpr = (BLangUnaryExpr) TreeBuilder.createUnaryExpressionNode();
+            Name operatorName = names.fromString(OperatorKind.LENGTHOF.value());
+            BInvokableType invokableType = new BInvokableType(Collections.singletonList(iExpr.expr.type),
+                                                              symTable.intType, null);
+            BPackageSymbol pkgSymbol = symTable.rootPkgSymbol;
+            PackageID pkgID = pkgSymbol.pkgID;
+            BOperatorSymbol bOperatorSymbol = new BOperatorSymbol(operatorName, pkgID, invokableType, pkgSymbol,
+                                                                  InstructionCodes.LENGTHOF);
+            lengthExpr.operator = OperatorKind.LENGTHOF;
+            lengthExpr.pos = pos;
+            lengthExpr.expr = iExpr.expr;
+            lengthExpr.type = symTable.intType;
+            lengthExpr.opSymbol = bOperatorSymbol;
+            result = rewriteExpr(lengthExpr);
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -115,6 +115,7 @@ import org.wso2.ballerinalang.compiler.tree.statements.BLangBlockStmt;
 import org.wso2.ballerinalang.compiler.tree.types.BLangValueType;
 import org.wso2.ballerinalang.compiler.util.BArrayState;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
+import org.wso2.ballerinalang.compiler.util.Constants;
 import org.wso2.ballerinalang.compiler.util.FieldKind;
 import org.wso2.ballerinalang.compiler.util.Name;
 import org.wso2.ballerinalang.compiler.util.Names;
@@ -685,6 +686,13 @@ public class TypeChecker extends BLangNodeVisitor {
             resultType = iExpr.iContext.operations.getLast().resultType;
             return;
         }
+
+        // Check if its the builtin length operation invocation.
+        if (isBuiltinLengthInvocation(iExpr)) {
+            checkBuiltinLengthInvocationExpr(iExpr);
+            return;
+        }
+
         if (iExpr.actionInvocation) {
             checkActionInvocationExpr(iExpr, exprType);
             return;
@@ -744,6 +752,18 @@ public class TypeChecker extends BLangNodeVisitor {
         } else {
             iExpr.originalType = iExpr.type;
         }
+    }
+
+    private void checkBuiltinLengthInvocationExpr(BLangInvocation iExpr) {
+        iExpr.builtinLengthOperationInvocation = true;
+        // Check if invocation contains any args.
+        if (iExpr.argExprs.size() > 0 | iExpr.restArgs.size() > 0 | iExpr.namedArgs.size() > 0) {
+            dlog.error(iExpr.pos, DiagnosticCode.TOO_MANY_ARGS_FUNC_CALL, iExpr.name);
+            return;
+        }
+        // Set the return type as INT.
+        iExpr.type = this.symTable.getTypeFromTag(TypeTags.INT);
+        resultType = types.checkType(iExpr, iExpr.type, expType);
     }
 
     public void visit(BLangTypeInit cIExpr) {
@@ -1551,6 +1571,37 @@ public class TypeChecker extends BLangNodeVisitor {
                 return iterableKind != IterableKind.SELECT
                         && iterableKind != IterableKind.UNDEFINED;
             }
+        }
+        return false;
+    }
+
+    /**
+     * Check if the invocation node is trying to invoke the builtin length operation and check if the expression can
+     * invoke the particular function.
+     *
+     * @param iExpr invocation node
+     * @return true if it is invoking the length operation and false otherwise
+     */
+    private boolean isBuiltinLengthInvocation(BLangInvocation iExpr) {
+        return Constants.BUILTIN_LENGTH_OPERATION.equals(iExpr.name.value) &&
+                canHaveLengthInvocation(iExpr.expr.type.tag);
+    }
+    /**
+     * Check for nodes that can invoke the builtin length operation.
+     *
+     * @param iExpr integer value of the expression tag
+     * @return true if the particular tag can invoke the length operation and false otherwise
+     */
+    private boolean canHaveLengthInvocation(int iExpr) {
+        switch (iExpr) {
+            case TypeTags.ARRAY:
+            case TypeTags.JSON:
+            case TypeTags.MAP:
+            case TypeTags.RECORD:
+            case TypeTags.TABLE:
+            case TypeTags.TUPLE:
+            case TypeTags.XML:
+                return true;
         }
         return false;
     }

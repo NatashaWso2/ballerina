@@ -50,6 +50,8 @@ public class BLangInvocation extends BLangAccessExpression implements Invocation
     public IterableContext iContext;
     public boolean actionInvocation;
     public boolean async;
+    // Variable required for the builtin length operation
+    public boolean builtinLengthOperationInvocation;
 
     /*
      * Below expressions are used by typechecker, desugar and codegen phases.
