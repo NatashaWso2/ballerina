@@ -1595,17 +1595,11 @@ public class TypeChecker extends BLangNodeVisitor {
     private boolean canHaveLengthInvocation(int iExpr) {
         switch (iExpr) {
             case TypeTags.ARRAY:
-                return true;
             case TypeTags.JSON:
-                return true;
             case TypeTags.MAP:
-                return true;
             case TypeTags.RECORD:
-                return true;
             case TypeTags.TABLE:
-                return true;
             case TypeTags.TUPLE:
-                return true;
             case TypeTags.XML:
                 return true;
         }
