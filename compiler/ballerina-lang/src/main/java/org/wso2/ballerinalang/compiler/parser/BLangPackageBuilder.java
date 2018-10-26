@@ -1307,7 +1307,7 @@ public class BLangPackageBuilder {
         addExpressionNode(checkedExpr);
     }
 
-    void createAwaitExpr(DiagnosticPos pos, Set<Whitespace> ws) {
+    void createWaitExpr(DiagnosticPos pos, Set<Whitespace> ws) {
         BLangAwaitExpr awaitExpr = TreeBuilder.createAwaitExpressionNode();
         awaitExpr.pos = pos;
         awaitExpr.addWS(ws);
@@ -2319,18 +2319,26 @@ public class BLangPackageBuilder {
         addStmtToCurrentBlock(workerSendNode);
     }
 
-    void addWorkerReceiveStmt(DiagnosticPos pos, Set<Whitespace> ws, String workerName, boolean hasKey) {
+    void addWorkerReceiveStmt(DiagnosticPos pos, Set<Whitespace> ws, String workerName, String varName,
+                              boolean hasKey, boolean isTrap, boolean isCheck) {
         BLangWorkerReceive workerReceiveNode = (BLangWorkerReceive) TreeBuilder.createWorkerReceiveNode();
         workerReceiveNode.setWorkerName(this.createIdentifier(workerName));
-        workerReceiveNode.expr = (BLangExpression) exprNodeStack.pop();
         workerReceiveNode.pos = pos;
         workerReceiveNode.addWS(ws);
+        workerReceiveNode.isTrap = isTrap;
+        workerReceiveNode.isCheck = isCheck;
         //if there are two expressions, this is a channel receive and the top expression is the key
+        // TODO handle hasKey properly
         if (hasKey) {
-            workerReceiveNode.keyExpr = workerReceiveNode.expr;
-            workerReceiveNode.expr = (BLangExpression) exprNodeStack.pop();
+            workerReceiveNode.keyExpr = (BLangExpression) exprNodeStack.pop();
             workerReceiveNode.isChannel = true;
         }
+        BLangVariable var = (BLangVariable) TreeBuilder.createVariableNode();
+        var.pos = pos;
+        var.addWS(ws);
+        var.setName(this.createIdentifier(varName));
+        var.setTypeNode(typeNodeStack.pop());
+        workerReceiveNode.setVariable(var);
         addStmtToCurrentBlock(workerReceiveNode);
     }
 

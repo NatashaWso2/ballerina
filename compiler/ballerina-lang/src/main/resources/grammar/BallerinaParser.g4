@@ -309,6 +309,7 @@ statement
     |   doneStatement
     |   scopeStatement
     |   compensateStatement
+    |   waitStatement
     ;
 
 variableDefinitionStatement
@@ -505,17 +506,26 @@ returnStatement
 workerInteractionStatement
     :   triggerWorker
     |   workerReply
+    |   flushWorker
     ;
 
 // below left Identifier is of type TYPE_MESSAGE and the right Identifier is of type WORKER or CHANNEL
 triggerWorker
-    :   expression RARROW Identifier (COMMA expression)? SEMICOLON        #invokeWorker
-    |   expression RARROW FORK SEMICOLON              #invokeFork
+    :   expression SENDARROW Identifier (COMMA expression)? SEMICOLON        #invokeWorker
+    |   expression SENDARROW FORK SEMICOLON                                  #invokeFork
     ;
 
 // below left Identifier is of type WORKER or CHANNEL and the right Identifier is of type message
 workerReply
-    :   expression LARROW Identifier (COMMA expression)? SEMICOLON
+    :   (typeName |VAR)? Identifier ASSIGN (CHECK | TRAP | (CHECK TRAP))? workerReplyExpr SEMICOLON
+    ;
+
+workerReplyExpr
+    : LARROW Identifier (COMMA expression)?
+    ;
+
+flushWorker
+    :   (typeName |VAR)? Identifier ASSIGN FLUSH LEFT_BRACKET Identifier RIGHT_BRACKET SEMICOLON
     ;
 
 variableReference
@@ -650,7 +660,6 @@ expression
     |   expression OR expression                                            # binaryOrExpression
     |   expression (ELLIPSIS | HALF_OPEN_RANGE) expression                  # integerRangeExpression
     |   expression QUESTION_MARK expression COLON expression                # ternaryExpression
-    |   awaitExpression                                                     # awaitExprExpression
     |   trapExpr                                                            # trapExpression
     |	expression matchExpression										    # matchExprExpression
     |   expression ELVIS expression                                         # elvisExpression
@@ -670,8 +679,14 @@ trapExpr
     :   TRAP expression
     ;
 
-awaitExpression
-    :   AWAIT expression                                                    # awaitExpr
+waitStatement
+    :   ((typeName |VAR)? Identifier ASSIGN)? waitExpression SEMICOLON
+    ;
+
+waitExpression
+    :   WAIT (TRAP)? LEFT_BRACE (Identifier | Identifier COLON expression) (PIPE Identifier | Identifier COLON expression)* RIGHT_BRACE
+    |   WAIT (TRAP)? expression (PIPE expression)*
+    |   WAIT (TRAP)? expression
     ;
 
 shiftExpression

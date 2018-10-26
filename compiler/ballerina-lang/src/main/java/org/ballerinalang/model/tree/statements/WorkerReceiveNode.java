@@ -18,6 +18,7 @@
 package org.ballerinalang.model.tree.statements;
 
 import org.ballerinalang.model.tree.IdentifierNode;
+import org.ballerinalang.model.tree.VariableNode;
 import org.ballerinalang.model.tree.expressions.ExpressionNode;
 
 /**
@@ -27,11 +28,15 @@ import org.ballerinalang.model.tree.expressions.ExpressionNode;
  */
 public interface WorkerReceiveNode extends StatementNode {
 
-    ExpressionNode getExpression();
+//    ExpressionNode getExpression();
 
-    ExpressionNode getKeyExpression();
+//    ExpressionNode getKeyExpression();
 
     IdentifierNode getWorkerName();
 
     void setWorkerName(IdentifierNode identifierNode);
+
+    VariableNode getVariable();
+
+    void setVariable(VariableNode var);
 }

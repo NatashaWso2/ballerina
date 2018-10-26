@@ -19,10 +19,12 @@ package org.wso2.ballerinalang.compiler.tree.statements;
 
 import org.ballerinalang.model.tree.IdentifierNode;
 import org.ballerinalang.model.tree.NodeKind;
+import org.ballerinalang.model.tree.VariableNode;
 import org.ballerinalang.model.tree.statements.WorkerReceiveNode;
 import org.wso2.ballerinalang.compiler.semantics.model.SymbolEnv;
 import org.wso2.ballerinalang.compiler.tree.BLangIdentifier;
 import org.wso2.ballerinalang.compiler.tree.BLangNodeVisitor;
+import org.wso2.ballerinalang.compiler.tree.BLangVariable;
 import org.wso2.ballerinalang.compiler.tree.expressions.BLangExpression;
 
 /**
@@ -30,23 +32,16 @@ import org.wso2.ballerinalang.compiler.tree.expressions.BLangExpression;
  *
  * @since 0.94
  */
-public class BLangWorkerReceive extends BLangStatement implements WorkerReceiveNode {
+public class BLangWorkerReceive extends BLangVariableDef implements WorkerReceiveNode {
 
     public BLangExpression expr;
     public BLangIdentifier workerIdentifier;
     public BLangExpression keyExpr;
     public boolean isChannel = false;
+    public boolean isTrap = false;
+    public boolean isCheck = false;
     public SymbolEnv env;
-
-    @Override
-    public BLangExpression getExpression() {
-        return expr;
-    }
-
-    @Override
-    public BLangExpression getKeyExpression() {
-        return keyExpr;
-    }
+    public BLangVariable var;
 
     @Override
     public BLangIdentifier getWorkerName() {
@@ -56,6 +51,16 @@ public class BLangWorkerReceive extends BLangStatement implements WorkerReceiveN
     @Override
     public void setWorkerName(IdentifierNode identifierNode) {
         this.workerIdentifier = (BLangIdentifier) identifierNode;
+    }
+
+    @Override
+    public BLangVariable getVariable() {
+        return var;
+    }
+
+    @Override
+    public void setVariable(VariableNode var)  {
+        this.var = (BLangVariable) var;
     }
 
     @Override
@@ -69,7 +74,7 @@ public class BLangWorkerReceive extends BLangStatement implements WorkerReceiveN
     }
     
     public String toActionString() {
-        return this.expr + " <- " + this.workerIdentifier;
+        return this.var.name + " <- " + this.workerIdentifier;
     }
 
     @Override

@@ -29,7 +29,7 @@ import org.wso2.ballerinalang.compiler.tree.BLangNodeVisitor;
  */
 public class BLangAwaitExpr extends BLangExpression implements AwaitExpressionNode {
 
-    private static final String AWAIT_KEYWORD = "await";
+    private static final String AWAIT_KEYWORD = "wait";
     
     public BLangExpression expr;
 

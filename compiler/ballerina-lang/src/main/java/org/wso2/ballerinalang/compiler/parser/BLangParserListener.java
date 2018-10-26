@@ -1609,9 +1609,11 @@ public class BLangParserListener extends BallerinaParserBaseListener {
         if (ctx.exception != null) {
             return;
         }
-
-        this.pkgBuilder.addWorkerReceiveStmt(getCurrentPos(ctx), getWS(ctx), ctx.Identifier().getText(), ctx
-                .expression().size() > 1);
+        String workerName = ctx.workerReplyExpr().Identifier().getText();
+        boolean isTrap = ctx.TRAP() != null;
+        boolean isCheck = ctx.CHECK() != null;
+        this.pkgBuilder.addWorkerReceiveStmt(getCurrentPos(ctx), getWS(ctx), workerName, ctx.Identifier().getText(),
+                                             ctx.workerReplyExpr().expression() != null, isTrap, isCheck);
     }
 
     /**
@@ -3128,13 +3130,14 @@ public class BLangParserListener extends BallerinaParserBaseListener {
 
     /**
      * {@inheritDoc}
+     *
+     * <p>The default implementation does nothing.</p>
      */
-    @Override
-    public void exitAwaitExpr(BallerinaParser.AwaitExprContext ctx) {
+    @Override public void exitWaitStatement(BallerinaParser.WaitStatementContext ctx) {
         if (ctx.exception != null) {
             return;
         }
-        this.pkgBuilder.createAwaitExpr(getCurrentPos(ctx), getWS(ctx));
+        this.pkgBuilder.createWaitExpr(getCurrentPos(ctx), getWS(ctx));
     }
 
     @Override

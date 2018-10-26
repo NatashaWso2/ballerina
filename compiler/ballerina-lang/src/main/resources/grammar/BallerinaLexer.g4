@@ -132,7 +132,7 @@ IN          : 'in' ;
 LOCK        : 'lock' ;
 UNTAINT     : 'untaint' ;
 START       : 'start' ;
-AWAIT       : 'await' ;
+WAIT        : 'wait' ;
 BUT         : 'but' ;
 CHECK       : 'check' ;
 DONE        : 'done' ;
@@ -140,6 +140,7 @@ SCOPE       : 'scope';
 COMPENSATION: 'compensation';
 COMPENSATE  : 'compensate' ;
 PRIMARYKEY  : 'primarykey' ;
+FLUSH  : 'flush' ;
 
 // Separators
 
@@ -199,6 +200,7 @@ ELLIPSIS    : '...' ;
 PIPE        : '|' ;
 EQUAL_GT    : '=>' ;
 ELVIS       : '?:' ;
+SENDARROW      : '->>' ;
 
 
 // Compound Assignment operators.
