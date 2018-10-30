@@ -508,6 +508,11 @@ returnStatement
 
 workerInteractionStatement
     :   triggerWorker
+    |   workerSendAsync
+    ;
+
+workerSendAsync
+    :   expression RARROW Identifier (COMMA expression)? SEMICOLON
     ;
 
 // below left Identifier is of type TYPE_MESSAGE and the right Identifier is of type WORKER or CHANNEL
@@ -664,7 +669,6 @@ expression
     |   expression (ELLIPSIS | HALF_OPEN_RANGE) expression                  # integerRangeExpression
     |   expression QUESTION_MARK expression COLON expression                # ternaryExpression
     |   expression SYNCRARROW Identifier (COMMA expression)?                # workerSendSyncExpression
-    |   expression RARROW Identifier (COMMA expression)?                    # workerSendAsyncExpression
     |   waitExpression                                                      # waitExprExpression
     |   trapExpr                                                            # trapExpression
     |	expression matchExpression										    # matchExprExpression
