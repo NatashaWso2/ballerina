@@ -1502,7 +1502,7 @@ public class BLangPackageBuilder {
         endCallableUnitBody(ws);
         addLambdaFunctionDef(pos, ws, false, false, false);
         String workerLambdaName = "0" + workerName;
-        addSimpleVariableDefStatement(pos, ws, workerLambdaName, true, true);
+        addSimpleVariableDefStatement(pos, ws, workerLambdaName, true, true, false);
 
         // Check if the worker is in a fork. If so add the lambda function to the worker list in fork, else ignore.
         if (!this.forkJoinNodesStack.empty()) {
@@ -1516,7 +1516,7 @@ public class BLangPackageBuilder {
         createFunctionInvocation(pos, ws, false);
         markLastInvocationAsAsync(pos);
 
-        addSimpleVariableDefStatement(pos, ws, workerName, true, true);
+        addSimpleVariableDefStatement(pos, ws, workerName, true, true, false);
     }
 
     void attachWorkerWS(Set<Whitespace> ws) {

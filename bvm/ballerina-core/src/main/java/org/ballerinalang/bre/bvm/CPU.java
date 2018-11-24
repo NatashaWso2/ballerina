@@ -897,14 +897,14 @@ public class CPU {
         }
 
         if (!checkIsLikeType(valueToBeStamped, targetType)) {
-            BError error;
+            BError error = null;
             if (valueToBeStamped != null) {
-                error = BLangVMErrors.createError(ctx,
-                        BLangExceptionHelper.getErrorMessage(RuntimeErrors.INCOMPATIBLE_STAMP_OPERATION,
-                                valueToBeStamped.getType(), targetType));
+//                error = BLangVMErrors.createError(ctx,
+//                        BLangExceptionHelper.getErrorMessage(RuntimeErrors.INCOMPATIBLE_STAMP_OPERATION,
+//                                valueToBeStamped.getType(), targetType));
             } else {
-                error = BLangVMErrors.createError(ctx,
-                        BLangExceptionHelper.getErrorMessage(RuntimeErrors.CANNOT_STAMP_NULL, targetType));
+//                error = BLangVMErrors.createError(ctx,
+//                        BLangExceptionHelper.getErrorMessage(RuntimeErrors.CANNOT_STAMP_NULL, targetType));
             }
             sf.refRegs[k] = error;
 //            BError error = BLangVMErrors.createError(ctx,
@@ -4124,23 +4124,6 @@ public class CPU {
         }
 
         return true;
-    }
-
-    /**
-     * Add the corresponding compensation function pointer of the given scope, to the compensations table. A copy of
-     * current worker data of the args also added to the table.
-     * @param scopeEnd current scope instruction
-     * @param ctx current WorkerExecutionContext
-     */
-    private static void addToCompensationTable(Instruction.InstructionScopeEnd scopeEnd, WorkerExecutionContext ctx,
-            BFunctionPointer fp) {
-        CompensationTable compensationTable = (CompensationTable) ctx.globalProps.get(Constants.COMPENSATION_TABLE);
-        CompensationTable.CompensationEntry entry = compensationTable.getNewEntry();
-        entry.functionInfo = scopeEnd.function;
-        entry.scope = scopeEnd.scopeName;
-        entry.fPointer = fp;
-        compensationTable.compensations.add(entry);
-        compensationTable.index++;
     }
 
     public static boolean checkIsLikeType(BValue sourceValue, BType targetType) {
