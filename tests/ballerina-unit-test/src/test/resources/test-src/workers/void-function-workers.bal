@@ -21,9 +21,10 @@ function testVoid() {
 
 function testNew(){
     worker w1 {
-        runtime:sleep(2000);
+        int y = i + 10;
     }
     worker w2 {
+        runtime:sleep(500);
         i = 5;
     }
 }

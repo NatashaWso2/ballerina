@@ -21,17 +21,16 @@ package org.ballerinalang.test.worker;
 import org.ballerinalang.launcher.util.BCompileUtil;
 import org.ballerinalang.launcher.util.BRunUtil;
 import org.ballerinalang.launcher.util.CompileResult;
-import org.ballerinalang.model.values.BValue;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
 
 /**
  * Wait for all workers related tests.
@@ -40,8 +39,6 @@ import java.util.Arrays;
  */
 public class WaitForAllWorkersTest {
     private CompileResult result;
-    private PrintStream defaultOut;
-    private ByteArrayOutputStream tempOutStream;
 
     @BeforeClass
     public void setup() {
@@ -49,28 +46,22 @@ public class WaitForAllWorkersTest {
         Assert.assertEquals(result.getErrorCount(), 0, Arrays.asList(result.getDiagnostics()).toString());
     }
 
-    @BeforeMethod
-    private void initTempOut() throws IOException {
-        defaultOut = System.out;
-        tempOutStream = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(tempOutStream));
-    }
-
     @Test(description = "Test to see if worker continues to run even when default worker has finished")
     public void sendToFork() {
-        BRunUtil.invoke(result, "testWaitForAllWorkers", new BValue[0]);
-        String s = getSysOut();
-        Assert.assertEquals(s, "Finishing Default Worker" + System.lineSeparator() + "Finishing Worker w2"
-                + System.lineSeparator());
+        PrintStream defaultOut = System.out;
+        String expectedMsg = "Finishing Default Worker" + System.lineSeparator() + "Finishing Worker w2"
+                + System.lineSeparator();
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(outputStream));
+            BRunUtil.invoke(result, "testWaitForAllWorkers");
+            await().atMost(5, TimeUnit.SECONDS).until(() -> {
+                String loggedMsg = new String(outputStream.toByteArray());
+                return loggedMsg.equals(expectedMsg);
+            });
+        } finally {
+            System.setOut(defaultOut);
+        }
     }
 
-    @AfterMethod
-    private void closeTempOut() throws IOException {
-        System.out.close();
-        System.setOut(defaultOut);
-    }
-
-    private String getSysOut() {
-        return new String(tempOutStream.toByteArray());
-    }
 }

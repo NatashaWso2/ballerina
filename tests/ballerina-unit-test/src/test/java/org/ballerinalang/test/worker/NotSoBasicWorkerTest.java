@@ -26,6 +26,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.util.concurrent.TimeUnit;
+
+import static org.awaitility.Awaitility.await;
+
 /**
  * Advanced worker related tests.
  */
@@ -164,6 +168,7 @@ public class NotSoBasicWorkerTest {
         Assert.assertEquals(vals.length, 1);
         Assert.assertEquals(((BInteger) vals[0]).intValue(), 10);
         int pkgIndex = result.getProgFile().getEntryPackage().pkgIndex;
-        Assert.assertEquals(result.getProgFile().globalMemArea.getIntField(pkgIndex, 0), 5);
+        await().atMost(5, TimeUnit.SECONDS).until(() ->
+                result.getProgFile().globalMemArea.getIntField(pkgIndex, 0) == 5);
     }
 }
