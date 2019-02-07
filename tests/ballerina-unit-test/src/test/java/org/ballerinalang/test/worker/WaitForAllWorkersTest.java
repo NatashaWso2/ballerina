@@ -28,9 +28,6 @@ import org.testng.annotations.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
-
-import static org.awaitility.Awaitility.await;
 
 /**
  * Wait for all workers related tests.
@@ -55,10 +52,8 @@ public class WaitForAllWorkersTest {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             System.setOut(new PrintStream(outputStream));
             BRunUtil.invoke(result, "testWaitForAllWorkers");
-            await().atMost(5, TimeUnit.SECONDS).until(() -> {
-                String loggedMsg = new String(outputStream.toByteArray());
-                return loggedMsg.equals(expectedMsg);
-            });
+            String loggedMsg = new String(outputStream.toByteArray());
+            Assert.assertEquals(loggedMsg, expectedMsg);
         } finally {
             System.setOut(defaultOut);
         }

@@ -3,6 +3,7 @@ import ballerina/runtime;
 
 public function testWaitForAllWorkers() {
     test();
+    runtime:sleep(1000);
     io:println("Finishing Default Worker");
 }
 
